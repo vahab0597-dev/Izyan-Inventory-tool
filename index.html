@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Izyan Attar & Perfumes — Inventory & Billing (Internal)</title>
+<style>
+:root{--bg:#0d0b08;--card:#17140f;--gold:#c9a227;--gold2:#e9c766;--ivory:#f7f3ec;--muted:#b9ae95;--line:rgba(201,162,39,.25);--danger:#e05c5c;--good:#4CAF50}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ivory);font-family:'Helvetica Neue',Arial,sans-serif}
+.wrap{max-width:900px;margin:auto;padding:16px}
+.top{text-align:center;padding:18px 0;border-bottom:1px solid var(--line);margin-bottom:16px}
+.top h1{font-family:Georgia,serif;color:var(--gold2);font-size:22px;margin:0}
+.top small{color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-size:10px}
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tab{flex:1;min-width:110px;text-align:center;padding:10px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--gold2);font-size:12px;font-weight:bold;cursor:pointer}
+.tab.active{background:var(--gold);color:#0d0b08}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.card h3{margin:0 0 12px;font-size:14px;color:var(--gold2);text-transform:uppercase;letter-spacing:1px}
+label{display:block;font-size:11px;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.5px}
+input,select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#201b16;color:var(--ivory);font-size:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.btn{width:100%;padding:12px;border:0;border-radius:8px;background:linear-gradient(135deg,#e9c766,#c9a227);color:#0d0b08;font-weight:bold;font-size:13px;margin-top:12px;cursor:pointer}
+.btn.secondary{background:transparent;border:1.5px solid var(--gold);color:var(--gold2)}
+.btn.danger{background:transparent;border:1.5px solid var(--danger);color:var(--danger)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.05)}
+.low{color:var(--danger);font-weight:bold}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold}
+.tag.paid{background:rgba(76,175,80,.15);color:var(--good)}
+.tag.pending{background:rgba(224,92,92,.15);color:var(--danger)}
+.billLine{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:6px;align-items:center;margin-bottom:8px}
+.billLine input,.billLine select{padding:8px;font-size:12px}
+.removeLine{background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:8px;cursor:pointer}
+.totalRow{display:flex;justify-content:space-between;font-size:16px;font-weight:bold;padding:12px 0;border-top:1px solid var(--line);margin-top:8px}
+.hint{font-size:11px;color:var(--muted);margin-top:4px}
+#invoicePreview{background:#fff;color:#111;padding:28px;border-radius:8px;font-family:Georgia,serif}
+#invoicePreview h2{margin:0 0 2px;font-size:20px}
+#invoicePreview .sub{color:#666;font-size:11px;margin-bottom:16px}
+#invoicePreview table{font-family:Arial,sans-serif}
+#invoicePreview th{color:#888;border-bottom:1px solid #ccc}
+#invoicePreview td{border-bottom:1px solid #eee}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modalBox{background:var(--bg);border:1px solid var(--gold);border-radius:12px;padding:18px;max-width:520px;width:100%;max-height:88vh;overflow:auto}
+.backupRow{display:flex;gap:8px}
+.lockOverlay{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.lockBox{background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:28px 24px;max-width:340px;width:100%;text-align:center}
+.lockBox h2{font-family:Georgia,serif;color:var(--gold2);margin:0 0 6px;font-size:18px}
+.lockBox p{color:var(--muted);font-size:12px;margin:0 0 18px}
+.lockBox input{text-align:center;letter-spacing:2px;font-size:16px}
+.lockError{color:var(--danger);font-size:12px;min-height:16px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="lockOverlay" id="lockOverlay">
+  <div class="lockBox">
+    <h2>Izyan — Internal Manager</h2>
+    <p>Enter password to access inventory & billing.</p>
+    <input type="password" id="lockPassword" placeholder="Password" onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="btn" onclick="checkPassword()">🔓 Unlock</button>
+    <div class="lockError" id="lockError"></div>
+  </div>
+</div>
+<div class="wrap" id="mainApp" style="display:none">
+<div class="top"><h1>IZYAN — Internal Manager</h1><small>Inventory &amp; Billing • Local to this device</small></div>
+
+<div class="tabs">
+<button class="tab active" data-tab="inventory">Inventory</button>
+<button class="tab" data-tab="sell">Sell / Bill</button>
+<button class="tab" data-tab="bills">Bills</button>
+<button class="tab" data-tab="reports">Reports</button>
+<button class="tab" data-tab="backup">Backup</button>
+</div>
+
+<!-- INVENTORY -->
+<div class="panel active" id="panel-inventory">
+<div class="card">
+<h3>Add / Restock Item</h3>
+<div class="row3">
+<div><label>Item Name</label><input id="itemName" placeholder="e.g. Cool Water"></div>
+<div><label>Category</label><select id="itemCategory"><option value="attar">Attar</option><option value="alcohol">Alcohol (carrier)</option><option value="other">Other</option></select></div>
+<div><label>Low Stock Alert (g)</label><input id="itemLowStock" type="number" placeholder="e.g. 50"></div>
+</div>
+<label>Stock Received Now (grams) — adds to existing stock</label>
+<input id="itemStockIn" type="number" placeholder="e.g. 500">
+<button class="btn" onclick="addOrRestockItem()">➕ Add / Restock Item</button>
+</div>
+
+<div class="card">
+<h3>Current Stock</h3>
+<table id="inventoryTable"><thead><tr><th>Item</th><th>Category</th><th>Stock (g)</th><th>Recipe %</th><th></th></tr></thead><tbody></tbody></table>
+</div>
+</div>
+
+<!-- SELL / BILL -->
+<div class="panel" id="panel-sell">
+<div class="card">
+<h3>Customer Details</h3>
+<div class="row2">
+<div><label>Customer Name *</label><input id="custName" placeholder="e.g. Kiran"></div>
+<div><label>Mobile Number *</label><input id="custMobile" type="tel" maxlength="10" placeholder="10-digit mobile"></div>
+</div>
+</div>
+
+<div class="card">
+<h3>Bill Items</h3>
+<div id="billLines"></div>
+<button class="btn secondary" onclick="addBillLine()">➕ Add Item Row</button>
+<div class="row3" style="margin-top:14px">
+<div><label>Discount Type</label><select id="discountType" onchange="renderBillLines()"><option value="none">No Discount</option><option value="percent">Percentage (%)</option><option value="flat">Flat Amount (₹)</option></select></div>
+<div><label>Discount Value</label><input id="discountValue" type="number" placeholder="e.g. 10" oninput="renderBillLines()"></div>
+<div></div>
+</div>
+<div class="totalRow" style="border-top:none;padding-bottom:0;font-size:13px;font-weight:normal;color:var(--muted)"><span>Subtotal</span><span id="billSubtotal">₹0</span></div>
+<div class="totalRow" style="border-top:none;padding-top:0;font-size:13px;font-weight:normal;color:var(--muted)"><span>Discount</span><span id="billDiscount">- ₹0</span></div>
+<div class="totalRow"><span>Total</span><span id="billTotal">₹0</span></div>
+<label>Payment Status</label>
+<select id="paymentStatus"><option value="paid">Paid</option><option value="pending">Pending</option></select>
+<button class="btn" onclick="generateBill()">🧾 Save &amp; Generate Bill</button>
+<div class="hint">Saving this bill will automatically deduct the sold quantity from stock (using the recipe % for perfume sales).</div>
+</div>
+</div>
+
+<!-- BILLS -->
+<div class="panel" id="panel-bills">
+<div class="card"><h3>All Bills</h3><table id="billsTable"><thead><tr><th>Date</th><th>Customer</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
+</div>
+
+<!-- REPORTS -->
+<div class="panel" id="panel-reports">
+<div class="card">
+<div class="row2">
+<button class="tab active" id="reportViewDay" onclick="switchReportView('day')" style="margin:0">Day-wise</button>
+<button class="tab" id="reportViewMonth" onclick="switchReportView('month')" style="margin:0">Month-wise</button>
+</div>
+</div>
+<div class="card">
+<h3 id="reportSalesTitle">Sales — Day-wise</h3>
+<table id="reportSalesTable"><thead><tr><th>Date</th><th>Bills</th><th>Sales</th><th>Discount Given</th></tr></thead><tbody></tbody></table>
+</div>
+<div class="card">
+<h3 id="reportStockTitle">Stock Movement — Day-wise</h3>
+<table id="reportStockTable"><thead><tr><th>Date</th><th>Stock In (g)</th><th>Stock Out (g)</th></tr></thead><tbody></tbody></table>
+</div>
+</div>
+
+<!-- BACKUP -->
+<div class="panel" id="panel-backup">
+<div class="card"><h3>Backup &amp; Restore</h3>
+<p class="hint">This tool stores everything only in this browser. If you clear browser data or switch devices, you'll lose it — so back up regularly.</p>
+<div class="backupRow">
+<button class="btn secondary" onclick="downloadBackup()">⬇ Download Backup (.json)</button>
+</div>
+<label style="margin-top:16px">Restore from Backup</label>
+<input type="file" id="restoreFile" accept="application/json">
+<button class="btn danger" onclick="restoreBackup()">⚠ Restore (overwrites current data)</button>
+</div>
+</div>
+
+</div>
+
+<div class="modal" id="invoiceModal"><div class="modalBox">
+<div id="invoicePreview"></div>
+<div class="row2" style="margin-top:14px">
+<button class="btn secondary" onclick="downloadInvoicePDF()">⬇ Download PDF</button>
+<button class="btn secondary" onclick="downloadInvoiceImage()">⬇ Download Image</button>
+</div>
+<button class="btn" onclick="closeInvoiceModal()">Done</button>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ---------- Password lock ----------
+// Change this password to whatever you like.
+const APP_PASSWORD = 'IZYAN2026';
+function checkPassword(){
+  const entered = document.getElementById('lockPassword').value;
+  const err = document.getElementById('lockError');
+  if(entered === APP_PASSWORD){
+    document.getElementById('lockOverlay').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+  } else {
+    err.textContent = 'Incorrect password. Try again.';
+  }
+}
+
+const STORE_KEY = 'izyan_inventory_v1';
+function loadData(){
+  try{
+    const d = JSON.parse(localStorage.getItem(STORE_KEY)) || { items: [], bills: [], transactions: [] };
+    d.items = d.items || [];
+    d.bills = d.bills || [];
+    d.transactions = d.transactions || [];
+    return d;
+  }
+  catch(e){ return { items: [], bills: [], transactions: [] }; }
+}
+function saveData(){ localStorage.setItem(STORE_KEY, JSON.stringify(DATA)); }
+let DATA = loadData();
+
+function logTransaction(type, itemName, qtyGrams, note, billId){
+  DATA.transactions.push({
+    dateISO: new Date().toISOString(),
+    dateDisplay: new Date().toLocaleString('en-IN'),
+    type, itemName, qtyGrams, note: note || '', billId: billId || null
+  });
+}
+
+// ---------- Seed demo data on very first run ----------
+if(!DATA.items.length && !DATA.bills.length){
+  DATA.items = [
+    { id: 'cool-water', name: 'Cool Water', category: 'attar', stock: 50, lowStock: 20, recipePercent: null },
+    { id: 'musk-rajali', name: 'Musk Rajali', category: 'attar', stock: 500, lowStock: 100, recipePercent: 24 },
+    { id: 'alcohol', name: 'Alcohol', category: 'alcohol', stock: 2000, lowStock: 300, recipePercent: null }
+  ];
+  saveData();
+}
+
+function money(n){ return '₹' + Number(n||0).toLocaleString('en-IN'); }
+function findItem(id){ return DATA.items.find(i => i.id === id); }
+function alcoholItem(){ return DATA.items.find(i => i.category === 'alcohol'); }
+function slug(s){ return String(s).trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+
+// ---------- Tabs ----------
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+  if(t.dataset.tab === 'bills') renderBills();
+  if(t.dataset.tab === 'reports') renderReports();
+}));
+
+// ---------- Inventory ----------
+function addOrRestockItem(){
+  const name = document.getElementById('itemName').value.trim();
+  const category = document.getElementById('itemCategory').value;
+  const lowStock = Number(document.getElementById('itemLowStock').value) || 0;
+  const stockIn = Number(document.getElementById('itemStockIn').value) || 0;
+  if(!name){ alert('Please enter item name.'); return; }
+  const id = slug(name);
+  let item = findItem(id);
+  if(item){
+    item.stock += stockIn;
+    if(lowStock) item.lowStock = lowStock;
+  } else {
+    item = { id, name, category, stock: stockIn, lowStock, recipePercent: category === 'attar' ? null : null };
+    DATA.items.push(item);
+  }
+  if(item && stockIn > 0){
+    logTransaction('in', name, stockIn, 'Stock received');
+  }
+  saveData();
+  document.getElementById('itemName').value='';
+  document.getElementById('itemStockIn').value='';
+  document.getElementById('itemLowStock').value='';
+  renderInventory();
+}
+
+function setRecipePercent(id){
+  const item = findItem(id);
+  const val = prompt('Enter concentration % for "'+item.name+'" perfume (e.g. 24 means 24% attar + 76% alcohol per ml sold).', item.recipePercent || '');
+  if(val === null) return;
+  const num = Number(val);
+  item.recipePercent = Number.isFinite(num) && num > 0 ? num : null;
+  saveData();
+  renderInventory();
+}
+
+function deleteItem(id){
+  if(!confirm('Delete this item from inventory?')) return;
+  DATA.items = DATA.items.filter(i => i.id !== id);
+  saveData();
+  renderInventory();
+  renderSellDropdowns();
+}
+
+function renderInventory(){
+  const tbody = document.querySelector('#inventoryTable tbody');
+  tbody.innerHTML = DATA.items.map(i => `
+    <tr>
+      <td>${i.name}</td>
+      <td style="text-transform:capitalize">${i.category}</td>
+      <td class="${i.stock <= i.lowStock ? 'low' : ''}">${i.stock.toFixed(1)} g${i.stock <= i.lowStock ? ' ⚠' : ''}</td>
+      <td>${i.category==='attar' ? (i.recipePercent ? i.recipePercent+'%' : '<button class="btn secondary" style="padding:5px 8px;font-size:10px;margin:0" onclick="setRecipePercent(\'' + i.id + '\')">Set recipe</button>') : '—'}</td>
+      <td><button class="removeLine" onclick="deleteItem('${i.id}')">✕</button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="color:var(--muted)">No items yet.</td></tr>';
+  renderSellDropdowns();
+}
+
+// ---------- Sell / Bill ----------
+let billLineId = 0;
+let currentLines = [];
+
+function addBillLine(){
+  const lid = billLineId++;
+  currentLines.push({ lid, itemId: '', saleType: 'attar', qty: 0, rate: 0 });
+  renderBillLines();
+}
+function removeBillLine(lid){
+  currentLines = currentLines.filter(l => l.lid !== lid);
+  renderBillLines();
+}
+function updateLine(lid, field, value){
+  const line = currentLines.find(l => l.lid === lid);
+  if(!line) return;
+  line[field] = (field === 'qty' || field === 'rate') ? Number(value) || 0 : value;
+  if(field === 'saleType') line.qty = 0;
+  renderBillLines();
+}
+function itemOptions(selectedId){
+  return DATA.items.filter(i => i.category === 'attar').map(i =>
+    `<option value="${i.id}" ${i.id===selectedId?'selected':''}>${i.name}</option>`
+  ).join('');
+}
+function computeBillTotals(){
+  const subtotal = currentLines.reduce((s,l) => s + (l.qty * l.rate), 0);
+  const dType = document.getElementById('discountType').value;
+  const dValue = Number(document.getElementById('discountValue').value) || 0;
+  let discountAmount = 0;
+  if(dType === 'percent') discountAmount = subtotal * dValue / 100;
+  else if(dType === 'flat') discountAmount = dValue;
+  discountAmount = Math.min(discountAmount, subtotal);
+  const total = subtotal - discountAmount;
+  return { subtotal, dType, dValue, discountAmount, total };
+}
+function sizeOptions(saleType, selectedQty){
+  const sizes = saleType === 'perfume' ? [50, 100] : [6, 12];
+  const unit = saleType === 'perfume' ? 'ml' : 'g';
+  return sizes.map(s => `<option value="${s}" ${Number(selectedQty)===s?'selected':''}>${s}${unit}</option>`).join('');
+}
+function renderBillLines(){
+  const wrap = document.getElementById('billLines');
+  wrap.innerHTML = currentLines.map(l => `
+    <div class="billLine">
+      <select onchange="updateLine(${l.lid},'itemId',this.value)"><option value="">Select item</option>${itemOptions(l.itemId)}</select>
+      <select onchange="updateLine(${l.lid},'saleType',this.value)">
+        <option value="attar" ${l.saleType==='attar'?'selected':''}>Attar (g)</option>
+        <option value="perfume" ${l.saleType==='perfume'?'selected':''}>Perfume (ml)</option>
+      </select>
+      <select onchange="updateLine(${l.lid},'qty',this.value)"><option value="">Size</option>${sizeOptions(l.saleType, l.qty)}</select>
+      <input type="number" placeholder="Rate ₹" value="${l.rate||''}" oninput="updateLine(${l.lid},'rate',this.value)">
+      <button class="removeLine" onclick="removeBillLine(${l.lid})">✕</button>
+    </div>
+  `).join('') || '<div class="hint">No items added yet.</div>';
+  const t = computeBillTotals();
+  document.getElementById('billSubtotal').textContent = money(t.subtotal);
+  document.getElementById('billDiscount').textContent = '- ' + money(t.discountAmount);
+  document.getElementById('billTotal').textContent = money(t.total);
+}
+function renderSellDropdowns(){ renderBillLines(); }
+
+function generateBill(){
+  const name = document.getElementById('custName').value.trim();
+  const mobile = document.getElementById('custMobile').value.trim();
+  if(!name || !mobile){ alert('Please enter customer name and mobile number.'); return; }
+  if(!currentLines.length || currentLines.some(l => !l.itemId || !l.qty)){ alert('Please add at least one complete item row (item + quantity).'); return; }
+
+  // Validate stock availability first
+  for(const line of currentLines){
+    const item = findItem(line.itemId);
+    if(!item) continue;
+    if(line.saleType === 'attar'){
+      if(item.stock < line.qty){ alert(`Not enough stock for ${item.name}. Available: ${item.stock}g`); return; }
+    } else {
+      const pct = item.recipePercent;
+      if(!pct){ alert(`Please set a recipe % for "${item.name}" before selling it as perfume.`); return; }
+      const attarG = line.qty * pct / 100;
+      const alcG = line.qty - attarG;
+      if(item.stock < attarG){ alert(`Not enough ${item.name} attar stock. Needed: ${attarG.toFixed(1)}g, Available: ${item.stock}g`); return; }
+      const alc = alcoholItem();
+      if(!alc || alc.stock < alcG){ alert(`Not enough Alcohol stock. Needed: ${alcG.toFixed(1)}g`); return; }
+    }
+  }
+
+  // Deduct stock, and log a transaction for each deduction
+  const billId = 'B' + Date.now();
+  const billItems = currentLines.map(line => {
+    const item = findItem(line.itemId);
+    let detail = '';
+    if(line.saleType === 'attar'){
+      item.stock -= line.qty;
+      detail = `Attar ${line.qty}g`;
+      logTransaction('out', item.name, line.qty, `Sold to ${name}`, billId);
+    } else {
+      const pct = item.recipePercent;
+      const attarG = line.qty * pct / 100;
+      const alcG = line.qty - attarG;
+      item.stock -= attarG;
+      alcoholItem().stock -= alcG;
+      detail = `Perfume ${line.qty}ml`;
+      logTransaction('out', item.name, attarG, `Sold to ${name} (as ${line.qty}ml perfume)`, billId);
+      logTransaction('out', alcoholItem().name, alcG, `Used for ${line.qty}ml perfume sold to ${name}`, billId);
+    }
+    return { name: item.name, saleType: line.saleType, qty: line.qty, rate: line.rate, amount: line.qty * line.rate, detail };
+  });
+
+  const totals = computeBillTotals();
+  const bill = {
+    id: billId,
+    dateISO: new Date().toISOString(),
+    date: new Date().toLocaleString('en-IN'),
+    customer: name,
+    mobile,
+    items: billItems,
+    subtotal: totals.subtotal,
+    discountType: totals.dType,
+    discountValue: totals.dValue,
+    discountAmount: totals.discountAmount,
+    total: totals.total,
+    status: document.getElementById('paymentStatus').value
+  };
+  DATA.bills.push(bill);
+  saveData();
+  renderInventory();
+
+  // reset form
+  currentLines = [];
+  document.getElementById('custName').value = '';
+  document.getElementById('custMobile').value = '';
+  document.getElementById('discountType').value = 'none';
+  document.getElementById('discountValue').value = '';
+  renderBillLines();
+
+  showInvoice(bill);
+}
+
+// ---------- Bills tab ----------
+function renderBills(){
+  const tbody = document.querySelector('#billsTable tbody');
+  tbody.innerHTML = [...DATA.bills].reverse().map(b => `
+    <tr>
+      <td>${b.date}</td>
+      <td>${b.customer}<br><span class="hint">${b.mobile}</span></td>
+      <td>${money(b.total)}</td>
+      <td><span class="tag ${b.status}">${b.status}</span></td>
+      <td>
+        <button class="btn secondary" style="padding:6px 8px;font-size:10px;margin:0 0 4px" onclick="showInvoice(DATA.bills.find(x=>x.id==='${b.id}'))">View</button>
+        ${b.status==='pending' ? `<button class="btn secondary" style="padding:6px 8px;font-size:10px;margin:0" onclick="markPaid('${b.id}')">Mark Paid</button>` : ''}
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="color:var(--muted)">No bills yet.</td></tr>';
+}
+function markPaid(id){
+  const bill = DATA.bills.find(b => b.id === id);
+  if(bill){ bill.status = 'paid'; saveData(); renderBills(); }
+}
+
+// ---------- Invoice modal ----------
+function showInvoice(bill){
+  const el = document.getElementById('invoicePreview');
+  el.innerHTML = `
+    <h2>IZYAN Attar &amp; Perfumes</h2>
+    <div class="sub">Invoice • ${bill.date}</div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
+      <tr><td style="padding:2px 0"><b>Customer:</b> ${bill.customer}</td><td style="padding:2px 0"><b>Mobile:</b> ${bill.mobile}</td></tr>
+    </table>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr><th style="padding:6px 4px;text-align:left">Item</th><th style="padding:6px 4px;text-align:left">Detail</th><th style="padding:6px 4px;text-align:right">Rate</th><th style="padding:6px 4px;text-align:right">Amount</th></tr></thead>
+      <tbody>
+        ${bill.items.map(li => `<tr><td style="padding:6px 4px">${li.name}</td><td style="padding:6px 4px;font-size:11px;color:#666">${li.detail}</td><td style="padding:6px 4px;text-align:right">₹${li.rate}</td><td style="padding:6px 4px;text-align:right">${money(li.amount)}</td></tr>`).join('')}
+      </tbody>
+    </table>
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:#666;padding-top:10px">
+      <span>Subtotal</span><span>${money(bill.subtotal)}</span>
+    </div>
+    ${bill.discountAmount > 0 ? `<div style="display:flex;justify-content:space-between;font-size:13px;color:#666"><span>Discount ${bill.discountType==='percent' ? '('+bill.discountValue+'%)' : ''}</span><span>- ${money(bill.discountAmount)}</span></div>` : ''}
+    <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:16px;padding:12px 0;border-top:1px solid #ccc;margin-top:6px">
+      <span>Total</span><span>${money(bill.total)}</span>
+    </div>
+    <div style="font-size:11px;color:#888">Payment status: ${bill.status.toUpperCase()}</div>
+  `;
+  document.getElementById('invoiceModal').classList.add('open');
+}
+function closeInvoiceModal(){ document.getElementById('invoiceModal').classList.remove('open'); }
+
+function downloadInvoiceImage(){
+  html2canvas(document.getElementById('invoicePreview'), { scale: 2 }).then(canvas => {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'izyan-bill-' + Date.now() + '.png';
+    a.click();
+  });
+}
+function downloadInvoicePDF(){
+  html2canvas(document.getElementById('invoicePreview'), { scale: 2 }).then(canvas => {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'pt', 'a4');
+    const imgWidth = 500;
+    const imgHeight = canvas.height * (imgWidth / canvas.width);
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 40, 40, imgWidth, imgHeight);
+    pdf.save('izyan-bill-' + Date.now() + '.pdf');
+  });
+}
+
+// ---------- Reports (day-wise / month-wise) ----------
+let reportView = 'day';
+function switchReportView(view){
+  reportView = view;
+  document.getElementById('reportViewDay').classList.toggle('active', view === 'day');
+  document.getElementById('reportViewMonth').classList.toggle('active', view === 'month');
+  renderReports();
+}
+function periodKey(iso){
+  if(!iso) return 'Unknown';
+  return reportView === 'day' ? iso.slice(0,10) : iso.slice(0,7);
+}
+function renderReports(){
+  const label = reportView === 'day' ? 'Day-wise' : 'Month-wise';
+  document.getElementById('reportSalesTitle').textContent = 'Sales — ' + label;
+  document.getElementById('reportStockTitle').textContent = 'Stock Movement — ' + label;
+
+  // Sales grouping
+  const salesMap = {};
+  DATA.bills.forEach(b => {
+    const key = periodKey(b.dateISO);
+    if(!salesMap[key]) salesMap[key] = { bills: 0, sales: 0, discount: 0 };
+    salesMap[key].bills += 1;
+    salesMap[key].sales += b.total;
+    salesMap[key].discount += (b.discountAmount || 0);
+  });
+  const salesKeys = Object.keys(salesMap).sort().reverse();
+  document.querySelector('#reportSalesTable tbody').innerHTML = salesKeys.map(k => `
+    <tr><td>${k}</td><td>${salesMap[k].bills}</td><td>${money(salesMap[k].sales)}</td><td>${money(salesMap[k].discount)}</td></tr>
+  `).join('') || '<tr><td colspan="4" style="color:var(--muted)">No sales yet.</td></tr>';
+
+  // Stock movement grouping
+  const stockMap = {};
+  DATA.transactions.forEach(tx => {
+    const key = periodKey(tx.dateISO);
+    if(!stockMap[key]) stockMap[key] = { in: 0, out: 0 };
+    if(tx.type === 'in') stockMap[key].in += tx.qtyGrams;
+    else stockMap[key].out += tx.qtyGrams;
+  });
+  const stockKeys = Object.keys(stockMap).sort().reverse();
+  document.querySelector('#reportStockTable tbody').innerHTML = stockKeys.map(k => `
+    <tr><td>${k}</td><td>${stockMap[k].in.toFixed(1)}</td><td>${stockMap[k].out.toFixed(1)}</td></tr>
+  `).join('') || '<tr><td colspan="3" style="color:var(--muted)">No stock movement yet.</td></tr>';
+}
+
+// ---------- Backup / Restore ----------
+function downloadBackup(){
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'izyan-inventory-backup-' + Date.now() + '.json';
+  a.click();
+}
+function restoreBackup(){
+  const file = document.getElementById('restoreFile').files[0];
+  if(!file){ alert('Please choose a backup file first.'); return; }
+  if(!confirm('This will overwrite all current data. Continue?')) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      DATA = parsed;
+      saveData();
+      renderInventory();
+      renderBills();
+      alert('Backup restored successfully.');
+    }catch(e){ alert('Invalid backup file.'); }
+  };
+  reader.readAsText(file);
+}
+
+// ---------- Init ----------
+renderInventory();
+addBillLine();
+</script>
+</body>
+</html>
