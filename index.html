@@ -572,6 +572,16 @@ function applyPriceFillV1(){
 }
 applyCostFixV1();
 applyPriceFillV1();
+// One-time (Sep 2026): add New Arrival attars missing from inventory, 25g stock each.
+function applyNewArrivalsV1(){
+  if(db.settings.newArrivalsV1)return;
+  const NEW=[['Savage Dior',500,650],['Khamraha OG',500,650],['Hawas Intense',500,650]];
+  NEW.forEach(([name,a12,p50])=>{if(findProductByName(name))return;db.products.push({id:'p'+Date.now()+Math.random().toString(36).slice(2,7),sku:nextSku('Attar'),name,category:'Attar',size:'12ML',purchase:0,attar6:Math.round(a12/2),attar12:a12,perfume50:p50,perfume100:p50*2,selling:a12,stock:25,min:1,stockG:25,minG:1})});
+  db.settings.newArrivalsV1=new Date().toISOString();
+  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}
+  scheduleCloudSync();
+}
+applyNewArrivalsV1();
 renderAll();
 </script>
 </body></html>
