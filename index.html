@@ -558,7 +558,20 @@ function applyCostFixV1(){
   scheduleCloudSync();
 }
 function recomputeAllSaleCosts(){let alc=findProductByName('Alcohol');db.sales.forEach(s=>{let c=0;(s.items||[]).forEach(it=>{if(it.manual)return;let p=db.products.find(x=>x.id===it.productId);if(!p){c+=it.cost||0;return}let pc=Number(p.purchase)||0,cost=0;if(it.type==='Attar')cost=pc*it.qty*sizeMl(it);else if(it.type==='Perfume'){let{attarG,alcG}=perfumeSplit(it.qty,it.size);cost=pc*attarG+(Number(alc?.purchase)||0)*alcG}else if(it.type==='Raw Material')cost=pc*it.qty;else cost=pc*it.qty;it.cost=cost;c+=cost});s.cogs=c;s.profit=(s.total||0)-(s.tax||0)-c})}
+// One-time price fill (Sep 2026): 12ml Attar and 50ml Perfume rates from the IZYAN product list.
+// 6ml = half of 12ml, 100ml = double of 50ml. Only empty (0) price fields are filled; prices already set are kept.
+function applyPriceFillV1(){
+  if(db.settings.priceFillV1)return;
+  const LIST={'prince':[1000,1200],'musk rajali':[500,650],'purple oud':[500,650],'cool water':[500,650],'david off champion':[500,650],'burberry godess':[500,650],'azzaro most wanted':[500,650],'khamraha waha':[500,650],'chandan':[500,650],'9pm afnan':[500,650],'blue d channel':[500,650],'bleu d channel':[500,650],'gucci flora':[500,650],'gucci florel':[500,650],'gucci rush':[500,650],'dunhill red':[500,650],'turk khalifa':[650,800],'belgium musk':[650,800],'aramani gold':[500,650],'aquatic white':[350,550],'royal prophecy':[500,650],'malik al dhab':[500,650],'malik al dhahab':[500,650],'dove':[500,650],'dunhill icon':[500,650],'musk berry fume':[500,650],'tam dao':[500,650],'brut':[300,550],'arabian oud':[1000,1200],'red vanilla':[500,650],'valentino':[500,650],'hawas':[500,650],'musk safi':[500,650],'hawas intense':[500,650],'khamraha og':[500,650],'savage dior':[500,650],'peach musk':[1000,1200],'shezada':[1000,1200],'zaffran':[1000,1200],'black oud':[400,550],'sweet oud':[600,750],'aurum':[500,650],'cr7':[500,650],'opan d.':[500,650],'burberry weekend':[500,650],'red ocean':[500,650],'musky leather':[900,1050]};
+  db.products.forEach(p=>{if(!isAttar(p))return;let r=LIST[String(p.name||'').trim().toLowerCase()];if(!r)return;let [a12,p50]=r;
+    if(!(Number(p.attar12)>0))p.attar12=a12;if(!(Number(p.attar6)>0))p.attar6=Math.round(p.attar12/2);
+    if(!(Number(p.perfume50)>0))p.perfume50=p50;if(!(Number(p.perfume100)>0))p.perfume100=p.perfume50*2;p.selling=p.attar12});
+  db.settings.priceFillV1=new Date().toISOString();
+  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}
+  scheduleCloudSync();
+}
 applyCostFixV1();
+applyPriceFillV1();
 renderAll();
 </script>
 </body></html>
