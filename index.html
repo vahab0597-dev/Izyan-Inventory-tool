@@ -307,7 +307,31 @@ function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 function save(){localStorage.setItem(KEY,JSON.stringify(db));renderAll();scheduleCloudSync()}
 let cloudSyncTimer=null;
 function scheduleCloudSync(){if(!db.settings.cloudUrl)return;clearTimeout(cloudSyncTimer);cloudSyncTimer=setTimeout(pushToCloud,1500)}
-async function pushToCloud(){let url=(db.settings.cloudUrl||'').trim();if(!url)return;if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='Syncing to cloud…';try{let res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(db)});let json=await res.json().catch(()=>({}));if(json&&json.ok===false)throw Error(json.error||'Unknown error from Apps Script');if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='✓ Last synced: '+new Date().toLocaleTimeString('en-IN')}catch(e){if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='Cloud sync failed (data is still saved locally; will retry on next change): '+e.message}}
+// Coupons, marketing campaigns and the do-not-message list have no sheet of their own in the cloud backup,
+// so they travel as JSON text inside extra rows of the Settings sheet (split so no cell passes Google's 50,000-char limit).
+const EXT_CHUNK=40000,EXT_MAX_PARTS=10;
+function cloudPayload(){
+  let json=JSON.stringify({coupons:db.coupons||[],campaigns:db.campaigns||[],optOut:db.optOut||[]}),ext={},n=Math.ceil(json.length/EXT_CHUNK)||1;
+  for(let i=0;i<EXT_MAX_PARTS;i++)ext['extData_'+i]=i<n?'~'+json.slice(i*EXT_CHUNK,(i+1)*EXT_CHUNK):'';
+  ext.extDataParts=n;
+  return Object.assign({},db,{settings:Object.assign({},db.settings,ext)});
+}
+function mergeCloudExtras(cs){
+  let n=Number(cs&&cs.extDataParts)||0,json='';
+  for(let i=0;i<n;i++)json+=String(cs['extData_'+i]??'').replace(/^~/,'');
+  let ext=null;try{ext=json?JSON.parse(json):null}catch(e){ext=null}
+  if(ext){
+    (ext.coupons||[]).forEach(c=>{let l=db.coupons.find(x=>x.code===c.code);if(!l){db.coupons.push(c);return}
+      if(c.used&&!l.used){l.used=true;l.usedOn=c.usedOn;l.usedSaleId=c.usedSaleId}
+      if(c.multi){let u=l.uses||[];(c.uses||[]).forEach(x=>{if(!u.some(y=>y.saleId===x.saleId))u.push(x)});l.uses=u}});
+    let progress=c=>(c.recipients||[]).filter(r=>r.status!=='pending').length;
+    (ext.campaigns||[]).forEach(c=>{let i=db.campaigns.findIndex(x=>x.id===c.id);if(i<0)db.campaigns.push(c);else if(progress(c)>progress(db.campaigns[i]))db.campaigns[i]=c});
+    let key=m=>String(m||'').replace(/\D/g,'').slice(-10);
+    (ext.optOut||[]).forEach(o=>{if(!db.optOut.some(x=>key(x.mobile)===key(o.mobile)))db.optOut.push(o)});
+  }
+  Object.keys(db.settings).forEach(k=>{if(/^extData(_\d+|Parts)$/.test(k))delete db.settings[k]});
+}
+async function pushToCloud(){let url=(db.settings.cloudUrl||'').trim();if(!url)return;if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='Syncing to cloud…';try{let res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(cloudPayload())});let json=await res.json().catch(()=>({}));if(json&&json.ok===false)throw Error(json.error||'Unknown error from Apps Script');if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='✓ Last synced: '+new Date().toLocaleTimeString('en-IN')}catch(e){if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='Cloud sync failed (data is still saved locally; will retry on next change): '+e.message}}
 function saveCloudUrl(){db.settings.cloudUrl=(cloudUrl.value||'').trim();save();alert('Cloud backend URL saved.');if(db.settings.cloudUrl)cloudSyncNow()}
 function cloudSyncNow(){if(!db.settings.cloudUrl)return alert('Paste your Apps Script Web App URL first');clearTimeout(cloudSyncTimer);pushToCloud()}
 async function pullFromCloud(){
@@ -330,6 +354,7 @@ async function pullFromCloud(){
     db.expenses=d.expenses||[];
     db.payments=d.payments||[];
     db.settings=Object.assign({},db.settings,d.settings||{},{cloudUrl:url});
+    db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];mergeCloudExtras(d.settings||{});
     db.products.forEach(ensureInternalStock);
     localStorage.setItem(KEY,JSON.stringify(db));
     renderAll();
