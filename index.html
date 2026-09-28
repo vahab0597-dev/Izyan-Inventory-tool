@@ -957,10 +957,17 @@ function printInvoice(id){let x=db.sales.find(s=>s.id===id);if(!x)return;let s=d
 function ty$(id){return document.getElementById(id)}
 // ---- Loyalty coupon: 10% off the next order, valid 60 days, one-time use, not with other offers ----
 const LOYALTY_PCT=10,LOYALTY_DAYS=60;
+// Code = IZY-<FIRST NAME>, e.g. Mukti → IZY-MUKTI. If that code already exists → IZY-MUKTI2, IZY-MUKTI3 …
+function couponCodeFor(name){
+  let first=String(name||'').trim().split(/\s+/)[0]||'';
+  let base=first.toUpperCase().replace(/[^A-Z]/g,'').slice(0,12)||'GUEST';
+  let code='IZY-'+base,i=2;
+  while(db.coupons.some(x=>x.code===code))code='IZY-'+base+(i++);
+  return code;
+}
 function couponFor(saleId,name){
   let c=saleId?db.coupons.find(x=>x.saleId===saleId):null;if(c)return c;
-  let base=String(name||'GUEST').toUpperCase().replace(/[^A-Z]/g,'').slice(0,4).padEnd(4,'X'),code;
-  do{code='IZY-'+base+String(Math.floor(Math.random()*90)+10)}while(db.coupons.some(x=>x.code===code));
+  let code=couponCodeFor(name);
   let d=new Date();d.setDate(d.getDate()+LOYALTY_DAYS);
   c={code,customer:String(name||'').trim(),saleId:saleId||'',issued:new Date().toLocaleDateString('en-IN'),validTill:d.toLocaleDateString('en-IN'),pct:LOYALTY_PCT,used:false};
   db.coupons.push(c);try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}scheduleCloudSync();return c;
@@ -971,7 +978,7 @@ const tyIds=['tyName','tyMobile','tyEmail','tyProducts','tyInvoice','tyAmount','
 function tyUpdate(){
   if(!ty$('tyThankCard'))return;
   let n=ty$('tyName').value.trim()||'Valued Customer', p=ty$('tyProducts').value.trim()||'Your selected fragrance', note=ty$('tyNote').value.trim()||'Thank you for choosing IZYAN. We truly appreciate your trust and your purchase.';
-  ty$('tyPName').textContent=n;if(ty$('tyMName'))ty$('tyMName').textContent=(ty$('tyName').value.trim()?'for shopping with us, '+n.split(/\s+/)[0]:'for shopping with IZYAN');if(ty$('tyMCode')){let c=tyCurrentCoupon();ty$('tyMCode').textContent=c?c.code:'IZY-XXXX';ty$('tyMValid').textContent=c?('Valid till '+c.validTill+' · one-time use'):'Code is created when you send the card';}if(ty$('tyFCode')){let c=tyCurrentCoupon();ty$('tyFCode').textContent=c?c.code:'IZY-XXXX';ty$('tyFValid').textContent=c?('Valid till '+c.validTill+' · one-time use'):'Code is created when you send the card';}ty$('tyPProducts').textContent=p;ty$('tyPNote').textContent=note;
+  ty$('tyPName').textContent=n;if(ty$('tyMName'))ty$('tyMName').textContent=(ty$('tyName').value.trim()?'for shopping with us, '+n.split(/\s+/)[0]:'for shopping with IZYAN');if(ty$('tyMCode')){let c=tyCurrentCoupon();let nm=ty$('tyName').value.trim();ty$('tyMCode').textContent=c?c.code:(nm?couponCodeFor(nm):'IZY-XXXX');ty$('tyMValid').textContent=c?('Valid till '+c.validTill+' · one-time use'):'Valid '+LOYALTY_DAYS+' days · one-time use';}if(ty$('tyFCode')){let c=tyCurrentCoupon();let nm=ty$('tyName').value.trim();ty$('tyFCode').textContent=c?c.code:(nm?couponCodeFor(nm):'IZY-XXXX');ty$('tyFValid').textContent=c?('Valid till '+c.validTill+' · one-time use'):'Valid '+LOYALTY_DAYS+' days · one-time use';}ty$('tyPProducts').textContent=p;ty$('tyPNote').textContent=note;
   ty$('tyPNext').textContent=ty$('tyNextmsg').value.trim()||'Explore our wide range of Attars & Perfumes — from fresh everyday fragrances to rich, long-lasting premium scents. We’d love to help you find your next favourite.';
   let m=[];if(ty$('tyInvoice').value.trim())m.push('Invoice: '+ty$('tyInvoice').value.trim());if(ty$('tyAmount').value.trim())m.push('Purchase: '+ty$('tyAmount').value.trim());ty$('tyPMeta').textContent=m.join('  •  ');
 }
@@ -1004,7 +1011,7 @@ function tySendThankYou(saleId){
 document.addEventListener('DOMContentLoaded',()=>{
   if(!ty$('tyThankCard'))return;
   tyIds.forEach(id=>ty$(id).addEventListener('input',tyUpdate));
-  ty$('tyName').addEventListener('input',()=>{if(window.tyCoupon&&!window.tyCoupon.saleId)window.tyCoupon=null});
+  ty$('tyName').addEventListener('input',()=>{if(window.tyCoupon&&!window.tyCoupon.saleId){window.tyCoupon=null;tyUpdate()}});
   // Visiting card reuses the same logo + shop QR already embedded in the full card
   const bigImgs=ty$('tyThankCard').querySelectorAll('img');if(bigImgs[0])ty$('tyMiniLogo').src=bigImgs[0].src;if(bigImgs[1])ty$('tyMiniQr').src=bigImgs[1].src;
   window.tyCardSize='mini';
