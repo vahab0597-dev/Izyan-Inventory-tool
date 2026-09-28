@@ -8,7 +8,8 @@
  *  - Business Manager reads the orders (with your secret key) and marks them Confirmed / Cancelled.
  *
  * One-time setup
- *  1. Go to https://script.google.com → New project → paste this whole file → Save.
+ *  1. Create a NEW Google Sheet "Izyan Online Orders" → Extensions → Apps Script → paste this whole file → Save.
+ *     (Or: https://script.google.com → New project; the script then creates the sheet itself.)
  *  2. Select the function "setup" in the toolbar → Run → allow the permissions.
  *     It creates the sheet and emails you your ADMIN KEY (also shown in the log).
  *  3. Deploy → New deployment → type "Web app"
@@ -191,7 +192,8 @@ function getOrdersSheet_() {
   const id = props.getProperty('SHEET_ID');
   if (id) { try { ss = SpreadsheetApp.openById(id); } catch (e) { ss = null; } }
   if (!ss) {
-    ss = SpreadsheetApp.create('Izyan Online Orders');
+    // Script opened from a Google Sheet (Extensions → Apps Script) → use that sheet; otherwise create one
+    ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.create('Izyan Online Orders');
     props.setProperty('SHEET_ID', ss.getId());
   }
   let sh = ss.getSheetByName(ORDERS_SHEET_NAME);
