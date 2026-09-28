@@ -605,7 +605,7 @@ function mkSplit(g){
   mkGroupMembers(g).forEach(c=>{if(!mkMobileKey(c.mobile)){noMob++;return}if(mkOptedOut(c.mobile)){opted++;return}if(mkLastMessaged(c.mobile)>week){recent++;return}ok.push(c)});
   return{ok,noMob,opted,recent};
 }
-const MK_DEFAULT_WEB='https://vahab0597-dev.github.io/izyan-attar-perfume/',MK_DEFAULT_IG='https://instagram.com/izyan.attar';
+const MK_DEFAULT_WEB='https://vahab0597-dev.github.io/Izyan-Attar-Perfume/',MK_DEFAULT_IG='https://instagram.com/izyan.attar';
 function mkLinks(){return{web:db.settings.mkWebsite||MK_DEFAULT_WEB,ig:db.settings.mkInstagram||MK_DEFAULT_IG}}
 function mkSaveLinks(){db.settings.mkWebsite=mkWeb.value.trim();db.settings.mkInstagram=mkInsta.value.trim();try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}scheduleCloudSync();mkPreview()}
 function mkInit(){
