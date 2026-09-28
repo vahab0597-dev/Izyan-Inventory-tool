@@ -975,7 +975,9 @@ function applyPhoneFixV1(){
 }
 applyPhoneFixV1();
 // Online Orders: load once on start (for the red count on the menu) and check again every 3 minutes
-setTimeout(()=>{if(ordersConfigured())fetchOnlineOrders(true)},1200);setInterval(()=>{if(ordersConfigured()&&!document.hidden)fetchOnlineOrders(true)},180000);
+setTimeout(()=>{if(ordersConfigured())fetchOnlineOrders(true)},1200);setInterval(()=>{if(ordersConfigured()&&!document.hidden)fetchOnlineOrders(true)},60000);
+// Phone/laptop: check again as soon as the app is opened or switched back to
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ordersConfigured())fetchOnlineOrders(true)});window.addEventListener('focus',()=>{if(ordersConfigured())fetchOnlineOrders(true)});
 // One-time (Sep 2026): Vyapar sale history 1 Jul – 23 Sep 2026 (35 bills). History only — stock is NOT deducted,
 // because current stock was counted after these sales. Vyapar #31 and #34 are already in this tool, so they are skipped.
 function applyVyaparImportV1(){
