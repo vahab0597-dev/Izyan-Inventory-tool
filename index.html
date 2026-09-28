@@ -214,8 +214,8 @@
 <div class="sub" id="mkSelCount" style="margin-top:8px"></div></div>
 <div class="mk-card"><div class="mk-title"><div class="mk-step">2</div>Choose message &amp; offer</div>
 <div class="mk-tpls" id="mkTpls"></div>
-<div class="mk-offer"><div><label>Campaign name</label><input id="mkName" oninput="mkPreview()"></div><div><label>Offer text {offer}</label><input id="mkOffer" value="10% OFF" oninput="mkPreview()"></div><div><label>Offer code {coupon}</label><input id="mkCode" style="text-transform:uppercase" oninput="mkPreview()"></div><div><label>Discount % (for the code)</label><input id="mkPct" type="number" min="0" max="90" value="10"></div><div><label>Valid till {valid_till}</label><input id="mkValid" type="date" oninput="mkPreview()"></div></div>
-<div class="mk-work"><div><textarea id="mkText" oninput="mkPreview()"></textarea><div class="mk-tags"><span class="sub">Insert:</span><button class="mk-tag" onclick="mkInsert('{name}')">{name}</button><button class="mk-tag" onclick="mkInsert('{coupon}')">{coupon}</button><button class="mk-tag" onclick="mkInsert('{offer}')">{offer}</button><button class="mk-tag" onclick="mkInsert('{valid_till}')">{valid_till}</button><span class="sub" id="mkChars" style="margin-left:auto"></span></div></div>
+<div class="mk-offer"><div><label>Campaign name</label><input id="mkName" oninput="mkPreview()"></div><div><label>Offer text {offer}</label><input id="mkOffer" value="10% OFF" oninput="mkPreview()"></div><div><label>Offer code {coupon}</label><input id="mkCode" style="text-transform:uppercase" oninput="mkPreview()"></div><div><label>Discount % (for the code)</label><input id="mkPct" type="number" min="0" max="90" value="10"></div><div><label>Valid till {valid_till}</label><input id="mkValid" type="date" oninput="mkPreview()"></div><div><label>Website link {website}</label><input id="mkWeb" oninput="mkSaveLinks()"></div><div><label>Instagram {instagram}</label><input id="mkInsta" oninput="mkSaveLinks()"></div></div>
+<div class="mk-work"><div><textarea id="mkText" oninput="mkPreview()"></textarea><div class="mk-tags"><span class="sub">Insert:</span><button class="mk-tag" onclick="mkInsert('{name}')">{name}</button><button class="mk-tag" onclick="mkInsert('{coupon}')">{coupon}</button><button class="mk-tag" onclick="mkInsert('{offer}')">{offer}</button><button class="mk-tag" onclick="mkInsert('{valid_till}')">{valid_till}</button><button class="mk-tag" onclick="mkInsert('{website}')">{website}</button><button class="mk-tag" onclick="mkInsert('{instagram}')">{instagram}</button><span class="sub" id="mkChars" style="margin-left:auto"></span></div></div>
 <div class="mk-wa"><div class="h">📱 WhatsApp preview</div><div class="mk-bubble" id="mkBubble"></div></div></div></div>
 <div class="mk-card"><div class="mk-title"><div class="mk-step">3</div>Send</div>
 <div class="mk-row"><button class="mk-btn g" id="mkStartBtn" onclick="mkStart()">▶ Start sending to selected customers</button><button class="mk-btn o" onclick="mkExport()">📥 Export numbers (CSV) for WhatsApp Broadcast</button></div>
@@ -567,11 +567,11 @@ function saveReturn(){let s=db.sales.find(x=>x.id===rInv.value),x=s?.items?.[+rP
 function findPerson(list,name){return list.find(x=>x.name.trim().toLowerCase()===name.trim().toLowerCase())}
 // ================= Marketing (WhatsApp offers, sent one by one) =================
 const MK_TEMPLATES={
- festival:{t:'🎉 Festival offer',m:"Assalamu Alaikum {name} ✨\n\nThis festive season, celebrate with IZYAN Attar & Perfumes!\nEnjoy *{offer}* on our attars and perfumes with code *{coupon}*.\n\nValid till {valid_till}. Just reply here to order.\n\n— IZYAN Attar & Perfumes"},
- arrival:{t:'✨ New arrival',m:"Hi {name} 🌟\n\nSomething new has arrived at IZYAN! Our latest fragrances are now available as attar and perfume.\nGet *{offer}* on your order with code *{coupon}* (valid till {valid_till}).\n\nReply here and we'll help you pick your scent.\n— IZYAN Attar & Perfumes"},
- coupon:{t:'⏰ Coupon reminder',m:"Hi {name} 😊\n\nA quick reminder — your thank-you code *{coupon}* for *{offer}* is still waiting for you.\nIt is valid till {valid_till}. Reply here to use it on your next order!\n\n— IZYAN Attar & Perfumes"},
- miss:{t:'❤️ We miss you',m:"Assalamu Alaikum {name} ❤️\n\nIt has been a while! We would love to see you again at IZYAN Attar & Perfumes.\nHere is *{offer}* just for you with code *{coupon}*, valid till {valid_till}.\n\nReply here to order.\n— IZYAN Attar & Perfumes"},
- custom:{t:'💬 Custom message',m:"Hi {name},\n\n"}
+ festival:{t:'🎉 Festival offer',m:"Assalamu Alaikum {name} ✨\n\nThis festive season, celebrate with IZYAN Attar & Perfumes!\nEnjoy *{offer}* on our attars and perfumes with code *{coupon}*.\n\nValid till {valid_till}. Just reply here to order.\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"},
+ arrival:{t:'✨ New arrival',m:"Hi {name} 🌟\n\nSomething new has arrived at IZYAN! Our latest fragrances are now available as attar and perfume.\nGet *{offer}* on your order with code *{coupon}* (valid till {valid_till}).\n\nReply here and we'll help you pick your scent.\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"},
+ coupon:{t:'⏰ Coupon reminder',m:"Hi {name} 😊\n\nA quick reminder — your thank-you code *{coupon}* for *{offer}* is still waiting for you.\nIt is valid till {valid_till}. Reply here to use it on your next order!\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"},
+ miss:{t:'❤️ We miss you',m:"Assalamu Alaikum {name} ❤️\n\nIt has been a while! We would love to see you again at IZYAN Attar & Perfumes.\nHere is *{offer}* just for you with code *{coupon}*, valid till {valid_till}.\n\nReply here to order.\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"},
+ custom:{t:'💬 Custom message',m:"Hi {name},\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"}
 };
 const MK_GROUPS=[['all','All customers'],['attar','Bought Attar'],['perfume','Bought Perfume'],['inactive','30+ days no purchase'],['top','Top customers'],['coupon','Unused 10% coupon']];
 window.mk=window.mk||{group:'all',tpl:'festival',sel:null,inited:false};
@@ -605,7 +605,11 @@ function mkSplit(g){
   mkGroupMembers(g).forEach(c=>{if(!mkMobileKey(c.mobile)){noMob++;return}if(mkOptedOut(c.mobile)){opted++;return}if(mkLastMessaged(c.mobile)>week){recent++;return}ok.push(c)});
   return{ok,noMob,opted,recent};
 }
+const MK_DEFAULT_WEB='https://vahab0597-dev.github.io/izyan-attar-perfume/',MK_DEFAULT_IG='https://instagram.com/izyan.attar';
+function mkLinks(){return{web:db.settings.mkWebsite||MK_DEFAULT_WEB,ig:db.settings.mkInstagram||MK_DEFAULT_IG}}
+function mkSaveLinks(){db.settings.mkWebsite=mkWeb.value.trim();db.settings.mkInstagram=mkInsta.value.trim();try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}scheduleCloudSync();mkPreview()}
 function mkInit(){
+  mkWeb.value=mkLinks().web;mkInsta.value=mkLinks().ig;
   if(!window.mk.inited){window.mk.inited=true;let d=new Date();d.setDate(d.getDate()+15);mkValid.value=d.toISOString().slice(0,10);mkSelectTpl('festival',true)}
   mkRenderChips();mkSelectGroup(window.mk.group,true);mkRenderActive();mkRenderHistory();mkRenderOpt();mkRenderStats();
 }
@@ -639,7 +643,7 @@ function mkFill(text,c,camp){
   let own=mkUnusedCoupon(c.name);if((camp?camp.tpl:window.mk.tpl)==='coupon'&&own)code=own.code;
   let valid=camp?camp.validText:mkValidText();if((camp?camp.tpl:window.mk.tpl)==='coupon'&&own)valid=own.validTill;
   let first=String(c.name||'').trim().split(/\s+/)[0]||'there';
-  return text.replace(/\{name\}/g,first).replace(/\{coupon\}/g,code||'—').replace(/\{offer\}/g,camp?camp.offer:mkOffer.value.trim()).replace(/\{valid_till\}/g,valid||'—');
+  return text.replace(/\{name\}/g,first).replace(/\{coupon\}/g,code||'—').replace(/\{offer\}/g,camp?camp.offer:mkOffer.value.trim()).replace(/\{valid_till\}/g,valid||'—').replace(/\{website\}/g,mkLinks().web).replace(/\{instagram\}/g,mkLinks().ig);
 }
 function mkPreview(){let c=mkSelected()[0]||(window.mk.list||[])[0]||{name:'Customer'};mkBubble.textContent=mkFill(mkText.value,c);mkChars.textContent=mkText.value.length+' characters'}
 function mkActiveCampaign(){return db.campaigns.find(c=>c.status==='sending')}
