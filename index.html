@@ -94,6 +94,8 @@
 .mk-badge{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700}.mk-badge.s{background:#dcfce7;color:#15803d}.mk-badge.w{background:#fef3c7;color:#b45309}.mk-badge.x{background:#f3f4f6;color:#6b7280}
 .mk-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:12px}
 .mk-list span{padding:3px 8px;border-radius:99px;background:#f3f4f6}.mk-list span.sent{background:#dcfce7;color:#15803d}.mk-list span.skipped{background:#fee2e2;color:#c0392b}
+.mk-manual{margin:0 0 12px;border:1px dashed #cbd5e1;border-radius:10px;padding:10px 14px;background:#f8fafc}.mk-manual summary{cursor:pointer;font-weight:700;font-size:14px;color:#1d4ed8}.mk-manualBody{margin-top:10px}
+.mk-siteOffer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,#111827,#1f2937);color:#fff;border-radius:14px;padding:16px 18px;margin-bottom:18px;border-left:5px solid #d4af5a}.mk-siteOffer .sub{color:#e5e7eb;font-size:13.5px;margin-top:4px;white-space:pre-line}
 .mk-empty{padding:18px;text-align:center;color:var(--mk-muted);font-size:13.5px}
 @media(max-width:768px){.mk-work{grid-template-columns:1fr}.mk-chips,.mk-tpls{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.mk-stack thead{display:none}.mk-stack,.mk-stack tbody,.mk-stack tr,.mk-stack td{display:block;width:100%}.mk-stack tr{margin-bottom:10px;border:1px solid var(--mk-border);border-radius:8px;padding:6px;background:#fff}.mk-stack td{display:flex;justify-content:space-between;gap:10px;text-align:right;padding:5px 8px;border:0;border-bottom:1px solid #f3f4f6}.mk-stack td:last-child{border-bottom:0}.mk-stack td::before{content:attr(data-label);font-weight:650;color:var(--mk-muted);text-align:left}}
@@ -150,12 +152,25 @@
 .ty-qrHint{font-size:9px;color:#d6c4ad;text-align:center;margin-top:6px}
 @media(max-width:900px){.ty-grid{grid-template-columns:1fr}.ty-previewWrap{position:static}}
 @media(max-width:520px){.ty-row,.ty-btns{grid-template-columns:1fr}.tyThankCard{padding:28px 16px}.ty-thanks{font-size:38px}.ty-name{font-size:20px}}
+
+/* ===== Burger menu (all pages behind ☰) ===== */
+.sidebar{display:flex!important;justify-content:space-between;align-items:center;position:sticky}
+.topRight{display:flex;align-items:center;gap:8px;margin-left:auto}
+.curPage{background:#1e293b;color:#fff;border:0;border-radius:9px;padding:9px 13px;font-weight:750;font-size:13px;cursor:pointer;white-space:nowrap;max-width:48vw;overflow:hidden;text-overflow:ellipsis;width:auto;flex:none}
+.burgerBtn{position:relative;background:#d4af5a;color:#111827;border:0;border-radius:10px;width:44px;height:40px;font-size:22px;font-weight:900;cursor:pointer;line-height:1;flex:none;padding:0}
+.burgerBtn .navCount{position:absolute;top:-6px;right:-6px;margin:0}
+.nav{display:none!important;position:absolute;right:12px;top:calc(100% + 6px);width:270px;max-height:calc(100vh - 90px);overflow-y:auto;background:#fff;border-radius:14px;box-shadow:0 18px 40px #0f172a55;padding:8px;flex-direction:column;align-items:stretch;gap:2px;z-index:50}
+.nav.open{display:flex!important}
+.nav button{justify-content:flex-start!important;width:100%!important;color:#1f2937!important;font-size:14px!important;padding:11px 12px!important;text-align:left!important}
+.nav button.active,.nav button:hover{background:#eff6ff!important;color:#1d4ed8!important}
+@media(max-width:850px){.nav{right:8px;left:8px;width:auto}.brand{flex:1 1 auto;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:15px!important;padding:4px 2px!important}.brand small{display:none}.curPage{max-width:36vw;padding:8px 10px;font-size:12px}.topRight{gap:6px;flex:none}}
 </style>
 </head>
 <body>
 <aside class="sidebar">
 <div class="brand">IZYAN <b>Business Manager</b><small>Inventory • Billing • Accounts</small></div>
-<nav class="nav">
+<div class="topRight"><button class="curPage" id="curPage" onclick="show('dashboard',document.querySelector('.nav button'))" title="Go to Dashboard">🏠 Dashboard</button><button class="burgerBtn" id="burgerBtn" onclick="toggleMenu(event)" aria-label="Menu" aria-expanded="false">☰<span id="burgerDot" class="navCount" style="display:none"></span></button></div>
+<nav class="nav" id="mainMenu">
 <button class="active" onclick="show('dashboard',this)">🏠 Dashboard</button>
 <button onclick="show('products',this)">📦 Products</button>
 <button onclick="show('sales',this)">🧾 Sales / Billing</button>
@@ -206,9 +221,13 @@
 
 <section id="marketing" class="section"><div class="top"><div><h1>📣 Marketing</h1><p>Send offers to your customers on WhatsApp — one by one, safely</p></div></div>
 <div class="mk-stats"><div class="mk-stat"><div class="l">Customers with WhatsApp number</div><div class="v" id="mkStContacts">0</div></div><div class="mk-stat"><div class="l">Messages sent this month</div><div class="v" id="mkStSent">0</div></div><div class="mk-stat"><div class="l">Offer codes used</div><div class="v" id="mkStUsed">0</div></div><div class="mk-stat"><div class="l">Sales from offers</div><div class="v" id="mkStSales">₹0</div></div></div>
+<div class="mk-siteOffer" id="mkSiteOffer"><div><b>🌐 Offer running on the website</b><div id="mkSiteOfferText" class="sub">Checking…</div></div><button class="mk-btn g" id="mkSiteOfferBtn" onclick="mkUseSiteOffer()" disabled>Send this offer</button></div>
 <div id="mkActiveWrap"></div>
 <div class="mk-card"><div class="mk-title"><div class="mk-step">1</div>Choose who to send to</div>
 <div class="mk-chips" id="mkChips"></div>
+<details class="mk-manual"><summary>➕ Add WhatsApp numbers manually</summary><div class="mk-manualBody"><div class="mk-row"><input id="mkManName" class="search" placeholder="Name" style="max-width:220px"><input id="mkManMobile" class="search" placeholder="10-digit mobile" inputmode="tel" style="max-width:200px"><button class="mk-btn p" onclick="mkAddManual()">+ Add</button></div>
+<div class="sub" style="margin:10px 0 6px">Or paste many at once — one per line: <b>Name, Mobile</b> (or just the mobile)</div><textarea id="mkManBulk" rows="4" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #e5e7eb;border-radius:8px;font-family:inherit" placeholder="Ayesha, 9876543210&#10;9123456789"></textarea><div class="mk-row" style="margin-top:8px"><button class="mk-btn o" onclick="mkAddBulk()">Add all</button><span class="sub" id="mkManMsg"></span></div>
+<div class="sub" style="margin-top:8px">Saved numbers appear in <b>📇 Manual numbers</b> and in <b>All customers</b>.</div></div></details>
 <div class="mk-skip" id="mkSkip" style="display:none"></div>
 <div class="mk-scroll"><table class="mk-table mk-stack"><thead><tr><th style="width:36px"><input type="checkbox" id="mkAll" onchange="mkToggleAll(this.checked)" checked></th><th>Customer</th><th>Mobile</th><th>Last purchase</th><th>Total spent</th><th></th></tr></thead><tbody id="mkRows"></tbody></table></div>
 <div class="sub" id="mkSelCount" style="margin-top:8px"></div></div>
@@ -285,7 +304,7 @@ try{db=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
 if(!db){for(const k of LEGACY_KEYS){try{db=JSON.parse(localStorage.getItem(k)||'null');if(db)break}catch(e){}}}
 if(!db)db=JSON.parse(JSON.stringify(demo));
 db.settings=Object.assign({name:'IZYAN Attar & Perfumes',gst:'',mobile:'',email:'',address:'',accountHolder:'',bankName:'',accountNumber:'',ifsc:'',upiId:'',qrEnabled:true,qrMode:'total',sheetUrl:'',cloudUrl:''},db.settings||{});
-db.products=db.products||[];db.sales=db.sales||[];db.purchases=db.purchases||[];db.returns=db.returns||[];db.customers=db.customers||[];db.suppliers=db.suppliers||[];db.expenses=db.expenses||[];db.payments=db.payments||[];db.seq=Object.assign({sale:1,purchase:1,return:1,payment:1},db.seq||{});db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];
+db.products=db.products||[];db.sales=db.sales||[];db.purchases=db.purchases||[];db.returns=db.returns||[];db.customers=db.customers||[];db.suppliers=db.suppliers||[];db.expenses=db.expenses||[];db.payments=db.payments||[];db.seq=Object.assign({sale:1,purchase:1,return:1,payment:1},db.seq||{});db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];db.mkContacts=db.mkContacts||[];
 function sizeMl(p){return Number.parseFloat(String(p?.size||'').replace(/[^0-9.]/g,''))||0}
 function isAttar(p){return String(p?.category||'').toLowerCase()==='attar'}
 function isPerfume(p){return String(p?.category||'').toLowerCase()==='perfume'}
@@ -311,7 +330,7 @@ function scheduleCloudSync(){if(!db.settings.cloudUrl)return;clearTimeout(cloudS
 // so they travel as JSON text inside extra rows of the Settings sheet (split so no cell passes Google's 50,000-char limit).
 const EXT_CHUNK=40000,EXT_MAX_PARTS=10;
 function cloudPayload(){
-  let json=JSON.stringify({coupons:db.coupons||[],campaigns:db.campaigns||[],optOut:db.optOut||[]}),ext={},n=Math.ceil(json.length/EXT_CHUNK)||1;
+  let json=JSON.stringify({coupons:db.coupons||[],campaigns:db.campaigns||[],optOut:db.optOut||[],mkContacts:db.mkContacts||[]}),ext={},n=Math.ceil(json.length/EXT_CHUNK)||1;
   for(let i=0;i<EXT_MAX_PARTS;i++)ext['extData_'+i]=i<n?'~'+json.slice(i*EXT_CHUNK,(i+1)*EXT_CHUNK):'';
   ext.extDataParts=n;
   return Object.assign({},db,{settings:Object.assign({},db.settings,ext)});
@@ -328,6 +347,7 @@ function mergeCloudExtras(cs){
     (ext.campaigns||[]).forEach(c=>{let i=db.campaigns.findIndex(x=>x.id===c.id);if(i<0)db.campaigns.push(c);else if(progress(c)>progress(db.campaigns[i]))db.campaigns[i]=c});
     let key=m=>String(m||'').replace(/\D/g,'').slice(-10);
     (ext.optOut||[]).forEach(o=>{if(!db.optOut.some(x=>key(x.mobile)===key(o.mobile)))db.optOut.push(o)});
+    (ext.mkContacts||[]).forEach(o=>{if(!db.mkContacts.some(x=>key(x.mobile)===key(o.mobile)))db.mkContacts.push(o)});
   }
   Object.keys(db.settings).forEach(k=>{if(/^extData(_\d+|Parts)$/.test(k))delete db.settings[k]});
 }
@@ -354,7 +374,7 @@ async function pullFromCloud(){
     db.expenses=d.expenses||[];
     db.payments=d.payments||[];
     db.settings=Object.assign({},db.settings,d.settings||{},{cloudUrl:url});
-    db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];mergeCloudExtras(d.settings||{});
+    db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];db.mkContacts=db.mkContacts||[];mergeCloudExtras(d.settings||{});
     db.products.forEach(ensureInternalStock);
     localStorage.setItem(KEY,JSON.stringify(db));
     renderAll();
@@ -422,7 +442,9 @@ function addStockFromPhoto(){
   pkNameList.innerHTML=attarAndRawNames().map(n=>`<option value="${esc(n)}">`).join('');
   pkName.focus();
 }
-function show(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderAll();if(id==='orders')fetchOnlineOrders(true);if(id==='marketing')mkInit()}
+function toggleMenu(e){if(e)e.stopPropagation();let m=document.getElementById('mainMenu'),o=m.classList.toggle('open');burgerBtn.setAttribute('aria-expanded',o)}
+document.addEventListener('click',e=>{let m=document.getElementById('mainMenu');if(m&&m.classList.contains('open')&&!m.contains(e.target)&&!burgerBtn.contains(e.target)){m.classList.remove('open');burgerBtn.setAttribute('aria-expanded','false')}});
+function show(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');{let b=btn||document.querySelector(`.nav button[onclick*="'${id}'"]`),cp=document.getElementById('curPage');if(b&&!btn)b.classList.add('active');if(cp&&b)cp.textContent=b.childNodes[0].textContent.trim();let m=document.getElementById('mainMenu');if(m)m.classList.remove('open');window.scrollTo(0,0)}renderAll();if(id==='orders')fetchOnlineOrders(true);if(id==='marketing')mkInit()}
 function nextNo(t){let n=db.seq[t]++;return t==='sale'?'INV-'+String(n).padStart(4,'0'):t==='purchase'?'PUR-'+String(n).padStart(4,'0'):t==='return'?'RET-'+String(n).padStart(4,'0'):'PAY-'+String(n).padStart(4,'0')}
 function badge(p){return `<span class="badge ${p==='Paid'?'paid':p==='Due'?'due':p==='Partial'?'warn':''}">${esc(p)}</span>`}
 function lowLimit(p){let m=internalMin(p);if(isAttar(p))return Math.max(m,Number(db.settings.lowStockAttarG)||25);if(isRaw(p))return Math.max(m,Number(db.settings.lowStockRawG)||200);return m}
@@ -595,10 +617,11 @@ const MK_TEMPLATES={
  festival:{t:'🎉 Festival offer',m:"Assalamu Alaikum {name} ✨\n\nThis festive season, celebrate with IZYAN Attar & Perfumes!\nEnjoy *{offer}* on our attars and perfumes with code *{coupon}*.\n\nValid till {valid_till}. Just reply here to order.\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"},
  arrival:{t:'✨ New arrival',m:"Hi {name} 🌟\n\nSomething new has arrived at IZYAN! Our latest fragrances are now available as attar and perfume.\nGet *{offer}* on your order with code *{coupon}* (valid till {valid_till}).\n\nReply here and we'll help you pick your scent.\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"},
  coupon:{t:'⏰ Coupon reminder',m:"Hi {name} 😊\n\nA quick reminder — your thank-you code *{coupon}* for *{offer}* is still waiting for you.\nIt is valid till {valid_till}. Reply here to use it on your next order!\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"},
+ website:{t:'🌐 Website offer',m:"Assalamu Alaikum {name} ✨\n\n*{offer}* is now live at IZYAN Attar & Perfumes!\n\n{gifts}\n\nOffer valid till {valid_till}. Order on our website or just reply here.\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"},
  miss:{t:'❤️ We miss you',m:"Assalamu Alaikum {name} ❤️\n\nIt has been a while! We would love to see you again at IZYAN Attar & Perfumes.\nHere is *{offer}* just for you with code *{coupon}*, valid till {valid_till}.\n\nReply here to order.\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"},
  custom:{t:'💬 Custom message',m:"Hi {name},\n\n🛍️ Shop online: {website}\n📸 Instagram: {instagram}\n\n— IZYAN Attar & Perfumes"}
 };
-const MK_GROUPS=[['all','All customers'],['attar','Bought Attar'],['perfume','Bought Perfume'],['inactive','30+ days no purchase'],['top','Top customers'],['coupon','Unused 10% coupon']];
+const MK_GROUPS=[['all','All customers'],['manual','📇 Manual numbers'],['attar','Bought Attar'],['perfume','Bought Perfume'],['inactive','30+ days no purchase'],['top','Top customers'],['coupon','Unused 10% coupon']];
 window.mk=window.mk||{group:'all',tpl:'festival',sel:null,inited:false};
 function mkToday(){let d=new Date();d.setHours(0,0,0,0);return d}
 function mkFmtDate(iso){if(!iso)return'';let d=new Date(iso);return isNaN(d)?iso:d.toLocaleDateString('en-IN')}
@@ -612,11 +635,14 @@ function mkCustomers(){
   db.sales.forEach(s=>{let key=String(s.person||'').trim().toLowerCase();if(!key||key==='walk-in')return;let c=map[key]||(map[key]={name:s.person,mobile:'',spent:0,last:null,attar:false,perfume:false,bills:0});
     if(!c.mobile&&s.mobile)c.mobile=s.mobile;c.spent+=Number(s.total)||0;c.bills++;let d=parseBizDate(s.date);if(d&&(!c.last||d>c.last))c.last=d;
     (s.items||[]).forEach(i=>{if(i.type==='Attar')c.attar=true;if(i.type==='Perfume')c.perfume=true})});
-  return Object.values(map);
+  let list=Object.values(map),have=new Set(list.map(c=>mkMobileKey(c.mobile)).filter(Boolean));
+  db.mkContacts.forEach(m=>{let k=mkMobileKey(m.mobile);if(k&&!have.has(k)){have.add(k);list.push({name:m.name||'Customer',mobile:m.mobile,spent:0,last:null,attar:false,perfume:false,bills:0,manual:true})}});
+  return list;
 }
 function mkUnusedCoupon(name){let t=mkToday();return db.coupons.find(c=>!c.multi&&!c.used&&String(c.customer||'').trim().toLowerCase()===String(name).trim().toLowerCase()&&(!parseBizDate(c.validTill)||parseBizDate(c.validTill)>=t))}
 function mkGroupMembers(g){
   let all=mkCustomers(),t=mkToday();
+  if(g==='manual')return all.filter(c=>c.manual||db.mkContacts.some(m=>mkMobileKey(m.mobile)&&mkMobileKey(m.mobile)===mkMobileKey(c.mobile)));
   if(g==='attar')return all.filter(c=>c.attar);
   if(g==='perfume')return all.filter(c=>c.perfume);
   if(g==='inactive')return all.filter(c=>c.last&&(t-c.last)/864e5>30);
@@ -633,7 +659,39 @@ function mkSplit(g){
 const MK_DEFAULT_WEB='https://vahab0597-dev.github.io/Izyan-Attar-Perfume/',MK_DEFAULT_IG='https://instagram.com/izyan.attar';
 function mkLinks(){return{web:db.settings.mkWebsite||MK_DEFAULT_WEB,ig:db.settings.mkInstagram||MK_DEFAULT_IG}}
 function mkSaveLinks(){db.settings.mkWebsite=mkWeb.value.trim();db.settings.mkInstagram=mkInsta.value.trim();try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}scheduleCloudSync();mkPreview()}
+// Reads the same published "Offers" sheet the website uses, so Marketing always shows the live website offer
+const MK_OFFERS_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vQMdOSPXvgALgLlTU107QpaxVYwZIEX1RJvSNxhztqZ50NEK1dU8FHDPiapt5mkAA/pub?gid=1355987088&single=true&output=csv';
+// The website's automatic free-gift rules (same as FREE_GIFT_OFFER on the website; ends 31 Oct 2026)
+const MK_GIFT_END=new Date('2026-10-31T23:59:59+05:30');
+const MK_GIFT_TEXT="🎁 Buy 2 × 50ml Perfume → get a 30ml Perfume FREE\n🎁 Buy a 100ml Perfume → get a 30ml Perfume FREE\n🎁 Attar order of ₹999 or more → get a 6ml Attar FREE";
+function mkCsvRows(t){let rows=[],row=[],f='',q=false;for(let i=0;i<t.length;i++){let c=t[i];if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}else if(c=='"')q=true;else if(c==','){row.push(f);f=''}else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;row.push(f);rows.push(row);row=[];f=''}else f+=c}if(f||row.length){row.push(f);rows.push(row)}return rows}
+async function mkLoadSiteOffer(){
+  let box=document.getElementById('mkSiteOfferText');if(!box)return;
+  try{let res=await fetch(MK_OFFERS_CSV+'&t='+Date.now(),{cache:'no-store'});if(!res.ok)throw Error('HTTP '+res.status);
+    let rows=mkCsvRows(await res.text());let h=(rows[0]||[]).map(x=>x.replace(/^\uFEFF/,'').trim().toLowerCase()),r=rows[1]||[],col=n=>{let i=h.indexOf(n);return i>=0?String(r[i]||'').trim():''};
+    let active=/^(yes|y|true|1|on|active)$/i.test(col('active'));
+    window.mk.site={active,text:col('offer text'),code:col('discount code').toUpperCase(),pct:Number(col('discount percent'))||0,gifts:active&&Date.now()<=MK_GIFT_END.getTime()};
+  }catch(e){window.mk.site={error:String(e.message||e)}}
+  mkRenderSiteOffer();
+}
+function mkRenderSiteOffer(){
+  let s=window.mk.site||{},box=document.getElementById('mkSiteOfferText'),btn=document.getElementById('mkSiteOfferBtn');if(!box)return;
+  if(s.error){box.textContent='Could not read the website offer right now ('+s.error+'). Check internet and open this page again.';btn.disabled=true;return}
+  if(!s.active){box.textContent='No offer is running on the website right now.';btn.disabled=true;return}
+  let lines=[s.text||'Offer is active'];if(s.code&&s.pct)lines.push(`Code ${s.code} → ${s.pct}% off`);if(s.gifts)lines.push(MK_GIFT_TEXT.replace(/🎁 /g,'• ')+'\n(till 31 Oct 2026)');
+  box.textContent=lines.join('\n');btn.disabled=false;
+}
+function mkUseSiteOffer(){
+  let s=window.mk.site||{};if(!s.active)return;
+  mkSelectTpl('website');
+  mkOffer.value=s.text||'Our special offer';
+  if(s.code){mkCode.value=s.code;mkPct.value=s.pct||10}else{mkCode.value='';mkCode.placeholder='No code needed'}
+  if(s.gifts)mkValid.value='2026-10-31';
+  mkName.value='Website offer – '+new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  mkPreview();document.getElementById('mkTpls').scrollIntoView({behavior:'smooth',block:'center'});
+}
 function mkInit(){
+  if(!window.mk.siteLoaded){window.mk.siteLoaded=true;mkLoadSiteOffer()}else mkRenderSiteOffer();
   mkWeb.value=mkLinks().web;mkInsta.value=mkLinks().ig;
   if(!window.mk.inited){window.mk.inited=true;let d=new Date();d.setDate(d.getDate()+15);mkValid.value=d.toISOString().slice(0,10);mkSelectTpl('festival',true)}
   mkRenderChips();mkSelectGroup(window.mk.group,true);mkRenderActive();mkRenderHistory();mkRenderOpt();mkRenderStats();
@@ -645,7 +703,7 @@ function mkSelectGroup(g,keepSel){
   mkRenderChips();
   let notes=[];if(s.noMob)notes.push(`${s.noMob} skipped – no mobile number`);if(s.recent)notes.push(`${s.recent} skipped – messaged in last 7 days`);if(s.opted)notes.push(`${s.opted} skipped – do-not-message list`);
   mkSkip.style.display=notes.length?'':'none';mkSkip.textContent='⚠️ '+notes.join(' · ');
-  mkRows.innerHTML=s.ok.map((c,i)=>{let k=mkMobileKey(c.mobile);return `<tr><td data-label="Send"><input type="checkbox" ${window.mk.sel.has(k)?'checked':''} onchange="mkToggle('${k}',this.checked)"></td><td data-label="Customer"><b>${esc(c.name)}</b></td><td data-label="Mobile">${esc(c.mobile)}</td><td data-label="Last purchase">${c.last?c.last.toLocaleDateString('en-IN'):'—'}</td><td data-label="Total spent">${money(c.spent)}</td><td data-label=""><button class="mk-btn r" style="padding:4px 9px;font-size:11.5px" onclick="mkOptOutIdx(${i})">Said STOP</button></td></tr>`}).join('')||`<tr><td colspan="6" class="mk-empty">No customers with a WhatsApp number in this group yet. Add mobile numbers when you make bills.</td></tr>`;
+  mkRows.innerHTML=s.ok.map((c,i)=>{let k=mkMobileKey(c.mobile);return `<tr><td data-label="Send"><input type="checkbox" ${window.mk.sel.has(k)?'checked':''} onchange="mkToggle('${k}',this.checked)"></td><td data-label="Customer"><b>${esc(c.name)}</b></td><td data-label="Mobile">${esc(c.mobile)}</td><td data-label="Last purchase">${c.last?c.last.toLocaleDateString('en-IN'):'—'}</td><td data-label="Total spent">${money(c.spent)}</td><td data-label=""><button class="mk-btn r" style="padding:4px 9px;font-size:11.5px" onclick="mkOptOutIdx(${i})">Said STOP</button>${c.manual?` <button class="mk-btn o" style="padding:4px 9px;font-size:11.5px" onclick="mkRemoveContact('${k}')">Remove</button>`:''}</td></tr>`}).join('')||`<tr><td colspan="6" class="mk-empty">No customers with a WhatsApp number in this group yet. Add mobile numbers when you make bills.</td></tr>`;
   mkAll.checked=s.ok.length>0&&s.ok.every(c=>window.mk.sel.has(mkMobileKey(c.mobile)));
   mkUpdateSelCount();mkPreview();
 }
@@ -668,8 +726,9 @@ function mkFill(text,c,camp){
   let own=mkUnusedCoupon(c.name);if((camp?camp.tpl:window.mk.tpl)==='coupon'&&own)code=own.code;
   let valid=camp?camp.validText:mkValidText();if((camp?camp.tpl:window.mk.tpl)==='coupon'&&own)valid=own.validTill;
   let first=String(c.name||'').trim().split(/\s+/)[0]||'there';
-  return text.replace(/\{name\}/g,first).replace(/\{coupon\}/g,code||'—').replace(/\{offer\}/g,camp?camp.offer:mkOffer.value.trim()).replace(/\{valid_till\}/g,valid||'—').replace(/\{website\}/g,mkLinks().web).replace(/\{instagram\}/g,mkLinks().ig);
+  return text.replace(/\{name\}/g,first).replace(/\{coupon\}/g,code||'—').replace(/\{offer\}/g,camp?camp.offer:mkOffer.value.trim()).replace(/\{valid_till\}/g,valid||'—').replace(/\{gifts\}/g,(camp?camp.gifts:mkGiftsText())||'').replace(/\{website\}/g,mkLinks().web).replace(/\{instagram\}/g,mkLinks().ig);
 }
+function mkGiftsText(){let s=window.mk.site||{};let t=s.gifts?MK_GIFT_TEXT:'';if(s.code&&s.pct&&window.mk.tpl==='website')t=(t?t+'\n':'')+`🏷️ Use code *${s.code}* for ${s.pct}% off`;return t}
 function mkPreview(){let c=mkSelected()[0]||(window.mk.list||[])[0]||{name:'Customer'};mkBubble.textContent=mkFill(mkText.value,c);mkChars.textContent=mkText.value.length+' characters'}
 function mkActiveCampaign(){return db.campaigns.find(c=>c.status==='sending')}
 function mkStart(){
@@ -682,9 +741,9 @@ function mkStart(){
     let ex=db.coupons.find(c=>c.code===code);if(ex&&!ex.multi)return alert('This code is already used as a customer thank-you code. Pick another.');
     if(!pct)return alert('Enter the discount % for this code.');
   }
-  let camp={id:'cmp'+Date.now(),name:mkName.value.trim()||'Campaign',createdAt:new Date().toISOString(),group:(MK_GROUPS.find(g=>g[0]===window.mk.group)||[])[1],tpl,text,offer:mkOffer.value.trim(),code:tpl==='coupon'?'':code,pct,validText:mkValidText(),status:'sending',
+  let camp={id:'cmp'+Date.now(),name:mkName.value.trim()||'Campaign',createdAt:new Date().toISOString(),group:(MK_GROUPS.find(g=>g[0]===window.mk.group)||[])[1],tpl,text,offer:mkOffer.value.trim(),gifts:mkGiftsText(),code:tpl==='coupon'?'':code,pct,validText:mkValidText(),status:'sending',
     recipients:list.map(c=>({name:c.name,mobile:c.mobile,status:'pending',at:null}))};
-  if(camp.code&&/\{coupon\}/.test(text)){let ex=db.coupons.find(c=>c.code===camp.code);let d=mkValid.value?new Date(mkValid.value+'T00:00:00'):null;
+  if(camp.code&&(/\{coupon\}/.test(text)||tpl==='website')){let ex=db.coupons.find(c=>c.code===camp.code);let d=mkValid.value?new Date(mkValid.value+'T00:00:00'):null;
     if(!ex)db.coupons.push({code:camp.code,customer:'',saleId:'',issued:new Date().toLocaleDateString('en-IN'),validTill:d?d.toLocaleDateString('en-IN'):'',pct,used:false,multi:true,campaignId:camp.id,uses:[]});}
   db.campaigns.push(camp);save();mkInit();document.getElementById('mkActiveWrap').scrollIntoView({behavior:'smooth'});
 }
@@ -717,6 +776,10 @@ function mkRenderHistory(){
 function mkRenderOpt(){mkOpt.innerHTML=db.optOut.map((o,i)=>`<tr><td data-label="Name">${esc(o.name)}</td><td data-label="Mobile">${esc(o.mobile)}</td><td data-label="Since">${esc(o.date)}</td><td data-label=""><button class="mk-btn o" style="padding:4px 10px;font-size:12px" onclick="mkRemoveOpt(${i})">Remove</button></td></tr>`).join('')||'<tr><td colspan="4" class="mk-empty">Nobody on this list</td></tr>'}
 function mkOptOutIdx(i){let c=(window.mk.list||[])[i];if(c)mkOptOutCustomer(c.name,c.mobile)}
 function mkOptOutCustomer(name,mobile){if(!confirm(name+' will not get any offers from now on. OK?'))return;if(!mkOptedOut(mobile))db.optOut.push({name,mobile,date:new Date().toLocaleDateString('en-IN')});save();mkInit()}
+function mkAddContact(name,mobile){let k=mkMobileKey(mobile);if(!k)return 'bad';if(db.mkContacts.some(m=>mkMobileKey(m.mobile)===k))return 'dup';db.mkContacts.push({name:(name||'').trim()||'Customer',mobile:String(mobile).trim(),added:new Date().toLocaleDateString('en-IN')});return 'ok'}
+function mkAddManual(){let r=mkAddContact(mkManName.value,mkManMobile.value);if(r==='bad')return alert('Enter a valid 10-digit mobile number');if(r==='dup')return alert('This number is already saved');mkManName.value='';mkManMobile.value='';save();window.mk.sel=null;window.mk.group='manual';mkInit();mkManMsg.textContent='✓ Added'}
+function mkAddBulk(){let ok=0,dup=0,bad=0;String(mkManBulk.value||'').split(/\n+/).map(l=>l.trim()).filter(Boolean).forEach(l=>{let m=l.match(/(\+?\d[\d\s-]{8,}\d)/);if(!m){bad++;return}let name=l.replace(m[1],'').replace(/[,;:|-]+/g,' ').trim();let r=mkAddContact(name,m[1]);r==='ok'?ok++:r==='dup'?dup++:bad++});save();mkManBulk.value='';window.mk.sel=null;window.mk.group='manual';mkInit();mkManMsg.textContent=`✓ ${ok} added`+(dup?` · ${dup} already saved`:'')+(bad?` · ${bad} not valid`:'')}
+function mkRemoveContact(k){db.mkContacts=db.mkContacts.filter(m=>mkMobileKey(m.mobile)!==k);save();mkInit()}
 function mkAddOpt(){let n=mkOptName.value.trim(),m=mkOptMobile.value.trim();if(!mkMobileKey(m))return alert('Enter a valid 10-digit mobile number');if(!mkOptedOut(m))db.optOut.push({name:n||'—',mobile:m,date:new Date().toLocaleDateString('en-IN')});mkOptName.value='';mkOptMobile.value='';save();mkInit()}
 function mkRemoveOpt(i){db.optOut.splice(i,1);save();mkInit()}
 function mkRenderStats(){
@@ -760,7 +823,7 @@ function renderOnlineOrders(){
   let rows=document.getElementById('ordRows');if(!rows)return;
   let all=window.onlineOrders||[],f=document.getElementById('ordFilter')?.value||'New';
   let newCount=all.filter(o=>o.status==='New').length,badgeEl=document.getElementById('navOrdersCount');
-  if(badgeEl){badgeEl.textContent=newCount;badgeEl.style.display=newCount?'':'none'}
+  if(badgeEl){badgeEl.textContent=newCount;badgeEl.style.display=newCount?'':'none'}{let bd=document.getElementById('burgerDot');if(bd){bd.textContent=newCount;bd.style.display=newCount?'':'none'}}
   let list=f==='all'?all:all.filter(o=>o.status===f);
   if(!ordersConfigured()){rows.innerHTML='<tr><td colspan="6" class="empty">Set up Online Orders in ⚙️ Settings first (URL + admin key).</td></tr>';return}
   rows.innerHTML=list.map(o=>{
