@@ -52,6 +52,51 @@
 .ty-sizeRow{display:flex;gap:8px;justify-content:center;margin:0 0 14px}
 .ty-sizeBtn{border:1px solid #d6c29a;background:#fff;color:#5b4520;border-radius:999px;padding:7px 14px;font-weight:700;font-size:12.5px;cursor:pointer}
 .ty-sizeBtn.active{background:#111827;color:#f3d98f;border-color:#111827}
+/* ===== Marketing ===== */
+#marketing{--mk-muted:#6b7280;--mk-border:#e5e7eb;--mk-gold:#d4af5a;--mk-goldl:#fef9e7}
+.mk-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
+.mk-stat{background:#fff;padding:16px 18px;border-radius:12px;box-shadow:0 4px 15px #1720330a;border:1px solid var(--mk-border);border-left:4px solid var(--mk-gold)}
+.mk-stat .l{font-size:12.5px;color:var(--mk-muted);font-weight:600}.mk-stat .v{font-size:23px;font-weight:800;margin-top:4px}
+.mk-card{background:#fff;border-radius:14px;border:1px solid var(--mk-border);box-shadow:0 4px 15px #1720330a;padding:20px;margin-bottom:18px}
+.mk-title{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:17px;font-weight:750}
+.mk-step{background:#111827;color:var(--mk-gold);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
+.mk-chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.mk-chip{background:#f3f4f6;border:2px solid var(--mk-border);border-radius:10px;padding:11px 14px;cursor:pointer;text-align:left;transition:all .15s}
+.mk-chip:hover{border-color:var(--mk-gold);background:var(--mk-goldl)}.mk-chip.active{border-color:#2563eb;background:#eff6ff}
+.mk-chip b{display:block;font-size:14px}.mk-chip span{font-size:12px;color:var(--mk-muted)}.mk-chip.active span{color:#2563eb;font-weight:600}
+.mk-skip{background:#fffbeb;border:1px solid #fef3c7;padding:9px 13px;border-radius:8px;font-size:13px;color:#b45309;margin-bottom:12px}
+.mk-scroll{max-height:300px;overflow:auto;border:1px solid var(--mk-border);border-radius:8px}
+.mk-table{width:100%;border-collapse:collapse;font-size:13.5px;text-align:left}
+.mk-table th{background:#f3f4f6;padding:9px 12px;font-weight:650;color:var(--mk-muted);border-bottom:1px solid var(--mk-border);position:sticky;top:0}
+.mk-table td{padding:9px 12px;border-bottom:1px solid var(--mk-border)}.mk-table tr:last-child td{border-bottom:0}
+.mk-tpls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px}
+.mk-tpl{background:#f3f4f6;border:2px solid var(--mk-border);border-radius:10px;padding:11px;cursor:pointer;font-size:13px;font-weight:650}
+.mk-tpl:hover{border-color:var(--mk-gold)}.mk-tpl.active{border-color:#2563eb;background:#eff6ff;color:#2563eb}
+.mk-offer{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.mk-offer label{font-size:12px;font-weight:650;color:var(--mk-muted);display:block;margin-bottom:4px}
+.mk-offer input{width:100%;padding:9px 10px;border:1px solid var(--mk-border);border-radius:8px;font-size:14px;box-sizing:border-box}
+.mk-work{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+.mk-work textarea{width:100%;height:190px;padding:11px;border:1px solid var(--mk-border);border-radius:8px;font-size:14px;resize:vertical;box-sizing:border-box;font-family:inherit}
+.mk-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.mk-tag{background:#e0e7ff;color:#3730a3;padding:4px 8px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;border:0}
+.mk-wa{background:#efeae2;border-radius:12px;padding:14px;border:1px solid var(--mk-border)}
+.mk-wa .h{font-size:11.5px;font-weight:700;color:var(--mk-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.mk-bubble{background:#dcf8c6;padding:11px 13px;border-radius:8px 0 8px 8px;font-size:13px;color:#111b21;white-space:pre-wrap;word-break:break-word;box-shadow:0 1px .5px #00000022}
+.mk-queue{background:#f8fafc;border:1px solid var(--mk-border);border-radius:10px;padding:18px}
+.mk-prog{background:var(--mk-border);border-radius:99px;height:10px;overflow:hidden;margin:10px 0 14px}.mk-prog div{background:#15803d;height:100%;transition:width .3s}
+.mk-target{background:#fff;border:1px solid var(--mk-border);border-radius:8px;padding:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+.mk-target h4{margin:0;font-size:16px}.mk-target p{margin:2px 0 0;font-size:13px;color:var(--mk-muted)}
+.mk-btn{padding:9px 15px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:0;display:inline-flex;align-items:center;gap:6px;width:auto;flex:none}
+.mk-btn.p{background:#2563eb;color:#fff}.mk-btn.g{background:#15803d;color:#fff}.mk-btn.o{background:#fff;border:1px solid var(--mk-border);color:#1f2937}.mk-btn.r{background:#fee2e2;color:#c0392b}
+.mk-btn:disabled{opacity:.5;cursor:not-allowed}
+.mk-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mk-tip{font-size:12px;color:var(--mk-muted);background:#fff;padding:8px 12px;border-radius:6px;border:1px solid var(--mk-border)}
+.mk-badge{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700}.mk-badge.s{background:#dcfce7;color:#15803d}.mk-badge.w{background:#fef3c7;color:#b45309}.mk-badge.x{background:#f3f4f6;color:#6b7280}
+.mk-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:12px}
+.mk-list span{padding:3px 8px;border-radius:99px;background:#f3f4f6}.mk-list span.sent{background:#dcfce7;color:#15803d}.mk-list span.skipped{background:#fee2e2;color:#c0392b}
+.mk-empty{padding:18px;text-align:center;color:var(--mk-muted);font-size:13.5px}
+@media(max-width:768px){.mk-work{grid-template-columns:1fr}.mk-chips,.mk-tpls{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.mk-stack thead{display:none}.mk-stack,.mk-stack tbody,.mk-stack tr,.mk-stack td{display:block;width:100%}.mk-stack tr{margin-bottom:10px;border:1px solid var(--mk-border);border-radius:8px;padding:6px;background:#fff}.mk-stack td{display:flex;justify-content:space-between;gap:10px;text-align:right;padding:5px 8px;border:0;border-bottom:1px solid #f3f4f6}.mk-stack td:last-child{border-bottom:0}.mk-stack td::before{content:attr(data-label);font-weight:650;color:var(--mk-muted);text-align:left}}
 .navCount{display:inline-block;min-width:20px;padding:1px 7px;margin-left:4px;border-radius:999px;background:#dc2626;color:#fff;font-size:11.5px;font-weight:800;line-height:18px;text-align:center}
 .ordItems{margin:0;padding-left:16px;font-size:12.5px;line-height:1.45}.ordItems li.gift{color:#15803d;font-weight:600;list-style:'🎁 '}
 .ordAddr{font-size:12px;color:#6b5a45;max-width:230px;white-space:pre-line}
@@ -123,6 +168,7 @@
 <button onclick="show('reports',this)">📊 Reports</button>
 <button onclick="show('settings',this)">⚙️ Settings / Backup</button>
 <button id="navThankYou" onclick="show('thankyou',this)">💌 Thank You Card</button>
+<button id="navMarketing" onclick="show('marketing',this)">📣 Marketing</button>
 </nav></aside>
 
 <main class="main">
@@ -157,6 +203,28 @@
 <div class="toolbar"><select id="ordFilter" class="search" style="max-width:220px" onchange="renderOnlineOrders()"><option value="New">New (to be billed)</option><option value="Confirmed">Billed</option><option value="Cancelled">Cancelled</option><option value="all">All orders</option></select><span id="ordStatus" class="sub" style="align-self:center"></span></div>
 <div class="notice">Stock is reduced only when you press <b>Create Bill</b> and save it. Check the customer's WhatsApp message first — if they never sent it, call them or press <b>Cancel</b>.</div>
 <div class="panel"><div class="tablewrap"><table class="table"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody id="ordRows"></tbody></table></div></div></section>
+
+<section id="marketing" class="section"><div class="top"><div><h1>📣 Marketing</h1><p>Send offers to your customers on WhatsApp — one by one, safely</p></div></div>
+<div class="mk-stats"><div class="mk-stat"><div class="l">Customers with WhatsApp number</div><div class="v" id="mkStContacts">0</div></div><div class="mk-stat"><div class="l">Messages sent this month</div><div class="v" id="mkStSent">0</div></div><div class="mk-stat"><div class="l">Offer codes used</div><div class="v" id="mkStUsed">0</div></div><div class="mk-stat"><div class="l">Sales from offers</div><div class="v" id="mkStSales">₹0</div></div></div>
+<div id="mkActiveWrap"></div>
+<div class="mk-card"><div class="mk-title"><div class="mk-step">1</div>Choose who to send to</div>
+<div class="mk-chips" id="mkChips"></div>
+<div class="mk-skip" id="mkSkip" style="display:none"></div>
+<div class="mk-scroll"><table class="mk-table mk-stack"><thead><tr><th style="width:36px"><input type="checkbox" id="mkAll" onchange="mkToggleAll(this.checked)" checked></th><th>Customer</th><th>Mobile</th><th>Last purchase</th><th>Total spent</th><th></th></tr></thead><tbody id="mkRows"></tbody></table></div>
+<div class="sub" id="mkSelCount" style="margin-top:8px"></div></div>
+<div class="mk-card"><div class="mk-title"><div class="mk-step">2</div>Choose message &amp; offer</div>
+<div class="mk-tpls" id="mkTpls"></div>
+<div class="mk-offer"><div><label>Campaign name</label><input id="mkName" oninput="mkPreview()"></div><div><label>Offer text {offer}</label><input id="mkOffer" value="10% OFF" oninput="mkPreview()"></div><div><label>Offer code {coupon}</label><input id="mkCode" style="text-transform:uppercase" oninput="mkPreview()"></div><div><label>Discount % (for the code)</label><input id="mkPct" type="number" min="0" max="90" value="10"></div><div><label>Valid till {valid_till}</label><input id="mkValid" type="date" oninput="mkPreview()"></div></div>
+<div class="mk-work"><div><textarea id="mkText" oninput="mkPreview()"></textarea><div class="mk-tags"><span class="sub">Insert:</span><button class="mk-tag" onclick="mkInsert('{name}')">{name}</button><button class="mk-tag" onclick="mkInsert('{coupon}')">{coupon}</button><button class="mk-tag" onclick="mkInsert('{offer}')">{offer}</button><button class="mk-tag" onclick="mkInsert('{valid_till}')">{valid_till}</button><span class="sub" id="mkChars" style="margin-left:auto"></span></div></div>
+<div class="mk-wa"><div class="h">📱 WhatsApp preview</div><div class="mk-bubble" id="mkBubble"></div></div></div></div>
+<div class="mk-card"><div class="mk-title"><div class="mk-step">3</div>Send</div>
+<div class="mk-row"><button class="mk-btn g" id="mkStartBtn" onclick="mkStart()">▶ Start sending to selected customers</button><button class="mk-btn o" onclick="mkExport()">📥 Export numbers (CSV) for WhatsApp Broadcast</button></div>
+<div class="mk-tip" style="margin-top:12px">🛡️ Send only to customers who know you. Max 1 offer per customer per week keeps your WhatsApp number safe. If someone replies STOP, press “Said STOP”.</div></div>
+<div class="mk-card"><div class="mk-title">📜 Campaign history</div><div style="overflow-x:auto"><table class="mk-table mk-stack"><thead><tr><th>Campaign</th><th>Date</th><th>Group</th><th>Sent</th><th>Offer code</th><th>Times used</th><th>Sales</th><th>Status</th></tr></thead><tbody id="mkHist"></tbody></table></div></div>
+<div class="mk-card"><div class="mk-title" style="color:#c0392b">🚫 Do-not-message list</div><p class="sub" style="margin:-6px 0 10px">Customers who asked not to get offers. They are always skipped.</p>
+<div class="mk-row" style="margin-bottom:10px"><input id="mkOptName" class="search" placeholder="Name" style="max-width:200px"><input id="mkOptMobile" class="search" placeholder="Mobile" style="max-width:180px"><button class="mk-btn r" onclick="mkAddOpt()">+ Add</button></div>
+<table class="mk-table mk-stack"><thead><tr><th>Name</th><th>Mobile</th><th>Since</th><th></th></tr></thead><tbody id="mkOpt"></tbody></table></div>
+</section>
 
 <section id="settings" class="section"><div class="top"><div><h1>Settings / Backup</h1><p>Business details, bank details, UPI QR & data safety</p></div></div><div class="notice">UPI QR is generated from your UPI ID and the exact invoice amount. Bank details are printed on invoices when entered. Perfume sales can automatically consume Attar + Alcohol from inventory using the recipe saved on each perfume.</div>
 <div class="panel"><h2>Business Details</h2><div class="formgrid"><div class="field"><label>Business Name</label><input id="bizName"></div><div class="field"><label>GSTIN</label><input id="bizGst" placeholder="Optional"></div><div class="field"><label>Mobile</label><input id="bizMobile"></div><div class="field"><label>Email</label><input id="bizEmail"></div><div class="field full"><label>Address</label><textarea id="bizAddress"></textarea></div></div></div>
@@ -217,7 +285,7 @@ try{db=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
 if(!db){for(const k of LEGACY_KEYS){try{db=JSON.parse(localStorage.getItem(k)||'null');if(db)break}catch(e){}}}
 if(!db)db=JSON.parse(JSON.stringify(demo));
 db.settings=Object.assign({name:'IZYAN Attar & Perfumes',gst:'',mobile:'',email:'',address:'',accountHolder:'',bankName:'',accountNumber:'',ifsc:'',upiId:'',qrEnabled:true,qrMode:'total',sheetUrl:'',cloudUrl:''},db.settings||{});
-db.products=db.products||[];db.sales=db.sales||[];db.purchases=db.purchases||[];db.returns=db.returns||[];db.customers=db.customers||[];db.suppliers=db.suppliers||[];db.expenses=db.expenses||[];db.payments=db.payments||[];db.seq=Object.assign({sale:1,purchase:1,return:1,payment:1},db.seq||{});db.coupons=db.coupons||[];
+db.products=db.products||[];db.sales=db.sales||[];db.purchases=db.purchases||[];db.returns=db.returns||[];db.customers=db.customers||[];db.suppliers=db.suppliers||[];db.expenses=db.expenses||[];db.payments=db.payments||[];db.seq=Object.assign({sale:1,purchase:1,return:1,payment:1},db.seq||{});db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];
 function sizeMl(p){return Number.parseFloat(String(p?.size||'').replace(/[^0-9.]/g,''))||0}
 function isAttar(p){return String(p?.category||'').toLowerCase()==='attar'}
 function isPerfume(p){return String(p?.category||'').toLowerCase()==='perfume'}
@@ -329,7 +397,7 @@ function addStockFromPhoto(){
   pkNameList.innerHTML=attarAndRawNames().map(n=>`<option value="${esc(n)}">`).join('');
   pkName.focus();
 }
-function show(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderAll();if(id==='orders')fetchOnlineOrders(true)}
+function show(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderAll();if(id==='orders')fetchOnlineOrders(true);if(id==='marketing')mkInit()}
 function nextNo(t){let n=db.seq[t]++;return t==='sale'?'INV-'+String(n).padStart(4,'0'):t==='purchase'?'PUR-'+String(n).padStart(4,'0'):t==='return'?'RET-'+String(n).padStart(4,'0'):'PAY-'+String(n).padStart(4,'0')}
 function badge(p){return `<span class="badge ${p==='Paid'?'paid':p==='Due'?'due':p==='Partial'?'warn':''}">${esc(p)}</span>`}
 function lowLimit(p){let m=internalMin(p);if(isAttar(p))return Math.max(m,Number(db.settings.lowStockAttarG)||25);if(isRaw(p))return Math.max(m,Number(db.settings.lowStockRawG)||200);return m}
@@ -491,12 +559,149 @@ function billStockShortage(items){let need={};items.forEach(it=>{if(it.manual||!
 function inventoryCheckSale(item){if(item.manual)return true;let p=db.products.find(x=>x.id===item.productId);if(!p)return false;if(item.type==='Attar'){return internalStock(p)>=item.qty*sizeMl(item)}if(item.type==='Perfume'){let{attarG,alcG}=perfumeSplit(item.qty,item.size);let alc=findProductByName('Alcohol');return internalStock(p)>=attarG&&!!alc&&internalStock(alc)>=alcG}if(item.type==='Raw Material'){return internalStock(p)>=item.qty}return true}
 function applyInventoryForSale(item){if(item.manual)return 0;let p=db.products.find(x=>x.id===item.productId);if(!p)throw Error('Product not found for '+item.name+' / '+item.type+' / '+item.size);ensureInternalStock(p);if(item.type==='Attar'){let g=item.qty*sizeMl(item);p.stockG-=g;return(p.purchase||0)*g}if(item.type==='Perfume'){let{attarG,alcG}=perfumeSplit(item.qty,item.size);p.stockG-=attarG;let cost=(p.purchase||0)*attarG;let alc=findProductByName('Alcohol');if(alc){ensureInternalStock(alc);alc.stockG-=alcG;cost+=(alc.purchase||0)*alcG}return cost}if(item.type==='Raw Material'){p.stockG-=item.qty;return(p.purchase||0)*item.qty}return 0}
 function applyInventoryForPurchase(item){if(item.manual)return;if(!item.productId)return;let p=db.products.find(x=>x.id===item.productId);if(!p)return;ensureInternalStock(p);if(isAttar(p)||isRaw(p))p.stockG+=item.qty;else p.stock+=item.qty}
-function saveBill(kind){if(!window.billItems.length)return alert('Add at least one product');let sale=kind==='sale',name=bperson.value.trim()||(sale?'Walk-in':'Supplier'),mobile=bmobile.value.trim(),address=baddress.value.trim(),base=window.billItems.reduce((s,x)=>s+x.rate*x.qty,0),disc=Math.min(+bdisc.value||0,base),taxable=Math.max(0,base-disc),gst=Math.max(0,+bgst.value||0),tax=taxable*gst/100,total=taxable+tax,paid=Math.min(Math.max(+bpaid.value||0,0),total),due=total-paid,id=kind+Date.now(),items=JSON.parse(JSON.stringify(window.billItems));if(sale&&!items.every(inventoryCheckSale))return alert('Stock is insufficient for one or more selected items. Check Attar/Raw Material stock and the perfume recipe.');if(sale){let short=billStockShortage(items);if(short)return alert(short)}let cogs=0;try{if(sale)items.forEach(x=>{cogs+=applyInventoryForSale(x)});else items.forEach(applyInventoryForPurchase)}catch(e){return alert(e.message)}if(sale&&window.billCoupon){let c=db.coupons.find(x=>x.code===window.billCoupon.code);if(c){c.used=true;c.usedOn=new Date().toLocaleDateString('en-IN');c.usedSaleId=id}}let ord=sale?window.pendingOnlineOrder:null;let entry={id,invoice:nextNo(kind),onlineOrderId:ord?ord.orderId:undefined,couponCode:sale&&window.billCoupon?window.billCoupon.code:undefined,date:new Date().toLocaleDateString('en-IN'),person:name,mobile,address,items,subtotal:base,discount:disc,gst,tax,total,paid,due,payment:due===0?'Paid':paid>0?'Partial':'Due',cogs,profit:sale?(total-tax-cogs):0};db[sale?'sales':'purchases'].push(entry);let list=sale?db.customers:db.suppliers,obj=findPerson(list,name);if(!obj){obj=sale?{id:'c'+Date.now(),name,mobile,address,purchases:0,received:0,outstanding:0}:{id:'s'+Date.now(),name,mobile,address,purchases:0,paid:0,payable:0};list.push(obj)}if(mobile)obj.mobile=mobile;if(address)obj.address=address;if(sale){obj.purchases+=total;obj.outstanding+=due;obj.received+=paid}else{obj.purchases+=total;obj.payable+=due;obj.paid+=paid}save();closeModal();if(sale){window.pendingOnlineOrder=null;if(ord)onlineOrderBilled(ord,id);else printInvoice(id)}}
+function saveBill(kind){if(!window.billItems.length)return alert('Add at least one product');let sale=kind==='sale',name=bperson.value.trim()||(sale?'Walk-in':'Supplier'),mobile=bmobile.value.trim(),address=baddress.value.trim(),base=window.billItems.reduce((s,x)=>s+x.rate*x.qty,0),disc=Math.min(+bdisc.value||0,base),taxable=Math.max(0,base-disc),gst=Math.max(0,+bgst.value||0),tax=taxable*gst/100,total=taxable+tax,paid=Math.min(Math.max(+bpaid.value||0,0),total),due=total-paid,id=kind+Date.now(),items=JSON.parse(JSON.stringify(window.billItems));if(sale&&!items.every(inventoryCheckSale))return alert('Stock is insufficient for one or more selected items. Check Attar/Raw Material stock and the perfume recipe.');if(sale){let short=billStockShortage(items);if(short)return alert(short)}let cogs=0;try{if(sale)items.forEach(x=>{cogs+=applyInventoryForSale(x)});else items.forEach(applyInventoryForPurchase)}catch(e){return alert(e.message)}if(sale&&window.billCoupon){let c=db.coupons.find(x=>x.code===window.billCoupon.code);if(c&&c.multi){c.uses=(c.uses||[]);c.uses.push({saleId:id,on:new Date().toLocaleDateString('en-IN')})}else if(c){c.used=true;c.usedOn=new Date().toLocaleDateString('en-IN');c.usedSaleId=id}}let ord=sale?window.pendingOnlineOrder:null;let entry={id,invoice:nextNo(kind),onlineOrderId:ord?ord.orderId:undefined,couponCode:sale&&window.billCoupon?window.billCoupon.code:undefined,date:new Date().toLocaleDateString('en-IN'),person:name,mobile,address,items,subtotal:base,discount:disc,gst,tax,total,paid,due,payment:due===0?'Paid':paid>0?'Partial':'Due',cogs,profit:sale?(total-tax-cogs):0};db[sale?'sales':'purchases'].push(entry);let list=sale?db.customers:db.suppliers,obj=findPerson(list,name);if(!obj){obj=sale?{id:'c'+Date.now(),name,mobile,address,purchases:0,received:0,outstanding:0}:{id:'s'+Date.now(),name,mobile,address,purchases:0,paid:0,payable:0};list.push(obj)}if(mobile)obj.mobile=mobile;if(address)obj.address=address;if(sale){obj.purchases+=total;obj.outstanding+=due;obj.received+=paid}else{obj.purchases+=total;obj.payable+=due;obj.paid+=paid}save();closeModal();if(sale){window.pendingOnlineOrder=null;if(ord)onlineOrderBilled(ord,id);else printInvoice(id)}}
 function openReturn(){let opts=db.sales.map(x=>`<option value="${x.id}">${esc(x.invoice)} — ${esc(x.person)} — ${money(x.total)}</option>`).join('');modalContent.innerHTML=`<h2>Sales Return</h2><div class="formgrid"><div class="field full"><label>Invoice</label><select id="rInv" onchange="loadReturnItems()">${opts}</select></div><div class="field"><label>Product</label><select id="rProd"></select></div><div class="field"><label>Quantity</label><input id="rQty" type="number" min="1" value="1"></div><div class="field"><label>Refund Amount</label><input id="rRefund" type="number" min="0" value="0"></div><div class="field full"><label>Reason</label><input id="rReason" placeholder="Damaged / customer return / other"></div></div><div class="actions"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveReturn()">Save Return</button></div>`;loadReturnItems();modal.classList.add('show')}
 function loadReturnItems(){let s=db.sales.find(x=>x.id===rInv.value);rProd.innerHTML=(s?.items||[]).map((x,i)=>`<option value="${i}">${esc(x.name)} — ${esc(x.size)} — sold ${x.qty}</option>`).join('');let x=s?.items?.[0];if(x)rRefund.value=x.rate}
 function applyInventoryReturn(item,q,sale){if(item.manual||sale?.imported)return;let p=db.products.find(x=>x.id===item.productId);if(item.type==='Attar'){if(p){ensureInternalStock(p);p.stockG+=q*sizeMl(item)}}else if(item.type==='Perfume'){if(p){ensureInternalStock(p);let{attarG,alcG}=perfumeSplit(q,item.size);p.stockG+=attarG;let alc=findProductByName('Alcohol');if(alc){ensureInternalStock(alc);alc.stockG+=alcG}}}else if(item.type==='Raw Material'){if(p){ensureInternalStock(p);p.stockG+=q}}}
 function saveReturn(){let s=db.sales.find(x=>x.id===rInv.value),x=s?.items?.[+rProd.value],q=+rQty.value||0;if(!x||q<1||q>x.qty)return alert('Invalid return quantity');let refund=Math.max(0,+rRefund.value||0);applyInventoryReturn(x,q,s);let retCost=x.qty?((x.cost||0)/x.qty)*q:0;db.returns.push({cost:retCost,id:'ret'+Date.now()+Math.random().toString(36).slice(2),date:new Date().toLocaleDateString('en-IN'),number:nextNo('return'),invoice:s.invoice,person:s.person,product:x.name,productId:x.productId,type:x.type,size:x.size,qty:q,refund,reason:rReason.value});let c=db.customers.find(c=>c.name===s.person);if(c){c.purchases=Math.max(0,c.purchases-refund);c.outstanding=Math.max(0,c.outstanding-refund)}save();closeModal()}
 function findPerson(list,name){return list.find(x=>x.name.trim().toLowerCase()===name.trim().toLowerCase())}
+// ================= Marketing (WhatsApp offers, sent one by one) =================
+const MK_TEMPLATES={
+ festival:{t:'🎉 Festival offer',m:"Assalamu Alaikum {name} ✨\n\nThis festive season, celebrate with IZYAN Attar & Perfumes!\nEnjoy *{offer}* on our attars and perfumes with code *{coupon}*.\n\nValid till {valid_till}. Just reply here to order.\n\n— IZYAN Attar & Perfumes"},
+ arrival:{t:'✨ New arrival',m:"Hi {name} 🌟\n\nSomething new has arrived at IZYAN! Our latest fragrances are now available as attar and perfume.\nGet *{offer}* on your order with code *{coupon}* (valid till {valid_till}).\n\nReply here and we'll help you pick your scent.\n— IZYAN Attar & Perfumes"},
+ coupon:{t:'⏰ Coupon reminder',m:"Hi {name} 😊\n\nA quick reminder — your thank-you code *{coupon}* for *{offer}* is still waiting for you.\nIt is valid till {valid_till}. Reply here to use it on your next order!\n\n— IZYAN Attar & Perfumes"},
+ miss:{t:'❤️ We miss you',m:"Assalamu Alaikum {name} ❤️\n\nIt has been a while! We would love to see you again at IZYAN Attar & Perfumes.\nHere is *{offer}* just for you with code *{coupon}*, valid till {valid_till}.\n\nReply here to order.\n— IZYAN Attar & Perfumes"},
+ custom:{t:'💬 Custom message',m:"Hi {name},\n\n"}
+};
+const MK_GROUPS=[['all','All customers'],['attar','Bought Attar'],['perfume','Bought Perfume'],['inactive','30+ days no purchase'],['top','Top customers'],['coupon','Unused 10% coupon']];
+window.mk=window.mk||{group:'all',tpl:'festival',sel:null,inited:false};
+function mkToday(){let d=new Date();d.setHours(0,0,0,0);return d}
+function mkFmtDate(iso){if(!iso)return'';let d=new Date(iso);return isNaN(d)?iso:d.toLocaleDateString('en-IN')}
+function mkMobileKey(m){let p=waNumber(m);return p.length>=12?p.slice(-10):''}
+function mkOptedOut(m){let k=mkMobileKey(m);return !!k&&db.optOut.some(o=>mkMobileKey(o.mobile)===k)}
+function mkLastMessaged(m){let k=mkMobileKey(m),last=0;db.campaigns.forEach(c=>(c.recipients||[]).forEach(r=>{if(r.status==='sent'&&mkMobileKey(r.mobile)===k){let t=new Date(r.at).getTime();if(t>last)last=t}}));return last}
+// One row per customer: combines the customer ledger with their sale bills
+function mkCustomers(){
+  let map={};
+  db.customers.forEach(c=>{let key=c.name.trim().toLowerCase();map[key]={name:c.name,mobile:c.mobile||'',spent:0,last:null,attar:false,perfume:false,bills:0}});
+  db.sales.forEach(s=>{let key=String(s.person||'').trim().toLowerCase();if(!key||key==='walk-in')return;let c=map[key]||(map[key]={name:s.person,mobile:'',spent:0,last:null,attar:false,perfume:false,bills:0});
+    if(!c.mobile&&s.mobile)c.mobile=s.mobile;c.spent+=Number(s.total)||0;c.bills++;let d=parseBizDate(s.date);if(d&&(!c.last||d>c.last))c.last=d;
+    (s.items||[]).forEach(i=>{if(i.type==='Attar')c.attar=true;if(i.type==='Perfume')c.perfume=true})});
+  return Object.values(map);
+}
+function mkUnusedCoupon(name){let t=mkToday();return db.coupons.find(c=>!c.multi&&!c.used&&String(c.customer||'').trim().toLowerCase()===String(name).trim().toLowerCase()&&(!parseBizDate(c.validTill)||parseBizDate(c.validTill)>=t))}
+function mkGroupMembers(g){
+  let all=mkCustomers(),t=mkToday();
+  if(g==='attar')return all.filter(c=>c.attar);
+  if(g==='perfume')return all.filter(c=>c.perfume);
+  if(g==='inactive')return all.filter(c=>c.last&&(t-c.last)/864e5>30);
+  if(g==='top')return all.filter(c=>c.spent>0).sort((a,b)=>b.spent-a.spent).slice(0,10);
+  if(g==='coupon')return all.filter(c=>mkUnusedCoupon(c.name));
+  return all;
+}
+// Splits a group into sendable customers and skipped ones (with the reason)
+function mkSplit(g){
+  let ok=[],noMob=0,opted=0,recent=0,week=Date.now()-7*864e5;
+  mkGroupMembers(g).forEach(c=>{if(!mkMobileKey(c.mobile)){noMob++;return}if(mkOptedOut(c.mobile)){opted++;return}if(mkLastMessaged(c.mobile)>week){recent++;return}ok.push(c)});
+  return{ok,noMob,opted,recent};
+}
+function mkInit(){
+  if(!window.mk.inited){window.mk.inited=true;let d=new Date();d.setDate(d.getDate()+15);mkValid.value=d.toISOString().slice(0,10);mkSelectTpl('festival',true)}
+  mkRenderChips();mkSelectGroup(window.mk.group,true);mkRenderActive();mkRenderHistory();mkRenderOpt();mkRenderStats();
+}
+function mkRenderChips(){mkChips.innerHTML=MK_GROUPS.map(([k,t])=>{let s=mkSplit(k);return `<button class="mk-chip ${window.mk.group===k?'active':''}" onclick="mkSelectGroup('${k}')"><b>${t}</b><span>${s.ok.length} can be messaged</span></button>`}).join('')}
+function mkSelectGroup(g,keepSel){
+  window.mk.group=g;let s=mkSplit(g);window.mk.list=s.ok;
+  if(!keepSel||!window.mk.sel)window.mk.sel=new Set(s.ok.map(c=>mkMobileKey(c.mobile)));
+  mkRenderChips();
+  let notes=[];if(s.noMob)notes.push(`${s.noMob} skipped – no mobile number`);if(s.recent)notes.push(`${s.recent} skipped – messaged in last 7 days`);if(s.opted)notes.push(`${s.opted} skipped – do-not-message list`);
+  mkSkip.style.display=notes.length?'':'none';mkSkip.textContent='⚠️ '+notes.join(' · ');
+  mkRows.innerHTML=s.ok.map((c,i)=>{let k=mkMobileKey(c.mobile);return `<tr><td data-label="Send"><input type="checkbox" ${window.mk.sel.has(k)?'checked':''} onchange="mkToggle('${k}',this.checked)"></td><td data-label="Customer"><b>${esc(c.name)}</b></td><td data-label="Mobile">${esc(c.mobile)}</td><td data-label="Last purchase">${c.last?c.last.toLocaleDateString('en-IN'):'—'}</td><td data-label="Total spent">${money(c.spent)}</td><td data-label=""><button class="mk-btn r" style="padding:4px 9px;font-size:11.5px" onclick="mkOptOutIdx(${i})">Said STOP</button></td></tr>`}).join('')||`<tr><td colspan="6" class="mk-empty">No customers with a WhatsApp number in this group yet. Add mobile numbers when you make bills.</td></tr>`;
+  mkAll.checked=s.ok.length>0&&s.ok.every(c=>window.mk.sel.has(mkMobileKey(c.mobile)));
+  mkUpdateSelCount();mkPreview();
+}
+function mkToggle(k,on){on?window.mk.sel.add(k):window.mk.sel.delete(k);mkUpdateSelCount()}
+function mkToggleAll(on){(window.mk.list||[]).forEach(c=>{let k=mkMobileKey(c.mobile);on?window.mk.sel.add(k):window.mk.sel.delete(k)});mkSelectGroup(window.mk.group,true)}
+function mkSelected(){return (window.mk.list||[]).filter(c=>window.mk.sel.has(mkMobileKey(c.mobile)))}
+function mkUpdateSelCount(){let n=mkSelected().length;mkSelCount.textContent=`${n} customer${n===1?'':'s'} selected`;mkStartBtn.disabled=!n||!!mkActiveCampaign()}
+function mkSelectTpl(k,init){
+  window.mk.tpl=k;mkTpls.innerHTML=Object.entries(MK_TEMPLATES).map(([key,v])=>`<button class="mk-tpl ${key===k?'active':''}" onclick="mkSelectTpl('${key}')">${v.t}</button>`).join('');
+  mkText.value=MK_TEMPLATES[k].m;
+  let month=new Date().toLocaleString('en-IN',{month:'short'}).toUpperCase();
+  if(k==='coupon'){mkCode.value='';mkCode.placeholder="Each customer's own code";mkOffer.value='10% OFF'}else{mkCode.placeholder='e.g. IZY-'+month+'10';if(!mkCode.value)mkCode.value='IZY-'+month+'10'}
+  mkName.value=MK_TEMPLATES[k].t.replace(/^[^A-Za-z]+/,'')+' – '+new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  if(!init&&k==='coupon'&&window.mk.group!=='coupon')mkSelectGroup('coupon');else mkPreview();
+}
+function mkInsert(tag){let t=mkText,a=t.selectionStart,b=t.selectionEnd;t.value=t.value.slice(0,a)+tag+t.value.slice(b);t.focus();t.selectionStart=t.selectionEnd=a+tag.length;mkPreview()}
+function mkValidText(){let v=mkValid.value;if(!v)return'';let d=new Date(v+'T00:00:00');return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
+function mkFill(text,c,camp){
+  let code=(camp?camp.code:mkCode.value.trim().toUpperCase());
+  let own=mkUnusedCoupon(c.name);if((camp?camp.tpl:window.mk.tpl)==='coupon'&&own)code=own.code;
+  let valid=camp?camp.validText:mkValidText();if((camp?camp.tpl:window.mk.tpl)==='coupon'&&own)valid=own.validTill;
+  let first=String(c.name||'').trim().split(/\s+/)[0]||'there';
+  return text.replace(/\{name\}/g,first).replace(/\{coupon\}/g,code||'—').replace(/\{offer\}/g,camp?camp.offer:mkOffer.value.trim()).replace(/\{valid_till\}/g,valid||'—');
+}
+function mkPreview(){let c=mkSelected()[0]||(window.mk.list||[])[0]||{name:'Customer'};mkBubble.textContent=mkFill(mkText.value,c);mkChars.textContent=mkText.value.length+' characters'}
+function mkActiveCampaign(){return db.campaigns.find(c=>c.status==='sending')}
+function mkStart(){
+  if(mkActiveCampaign())return alert('Finish or stop the campaign that is already running first.');
+  let list=mkSelected();if(!list.length)return alert('Select at least one customer.');
+  let text=mkText.value.trim();if(!text)return alert('Write a message first.');
+  let tpl=window.mk.tpl,code=mkCode.value.trim().toUpperCase(),pct=Math.max(0,Math.min(90,+mkPct.value||0));
+  if(tpl!=='coupon'&&/\{coupon\}/.test(text)){
+    if(!/^[A-Z0-9-]{4,20}$/.test(code))return alert('Offer code should be 4–20 letters/numbers, e.g. IZY-OCT10');
+    let ex=db.coupons.find(c=>c.code===code);if(ex&&!ex.multi)return alert('This code is already used as a customer thank-you code. Pick another.');
+    if(!pct)return alert('Enter the discount % for this code.');
+  }
+  let camp={id:'cmp'+Date.now(),name:mkName.value.trim()||'Campaign',createdAt:new Date().toISOString(),group:(MK_GROUPS.find(g=>g[0]===window.mk.group)||[])[1],tpl,text,offer:mkOffer.value.trim(),code:tpl==='coupon'?'':code,pct,validText:mkValidText(),status:'sending',
+    recipients:list.map(c=>({name:c.name,mobile:c.mobile,status:'pending',at:null}))};
+  if(camp.code&&/\{coupon\}/.test(text)){let ex=db.coupons.find(c=>c.code===camp.code);let d=mkValid.value?new Date(mkValid.value+'T00:00:00'):null;
+    if(!ex)db.coupons.push({code:camp.code,customer:'',saleId:'',issued:new Date().toLocaleDateString('en-IN'),validTill:d?d.toLocaleDateString('en-IN'):'',pct,used:false,multi:true,campaignId:camp.id,uses:[]});}
+  db.campaigns.push(camp);save();mkInit();document.getElementById('mkActiveWrap').scrollIntoView({behavior:'smooth'});
+}
+function mkRenderActive(){
+  let c=mkActiveCampaign(),w=document.getElementById('mkActiveWrap');if(!c){w.innerHTML='';return}
+  let done=c.recipients.filter(r=>r.status!=='pending').length,sent=c.recipients.filter(r=>r.status==='sent').length,tot=c.recipients.length,cur=c.recipients.find(r=>r.status==='pending');
+  w.innerHTML=`<div class="mk-card" style="border:2px solid #15803d"><div class="mk-title">🚀 Sending: ${esc(c.name)}</div><div class="mk-queue">
+   <div class="mk-row" style="justify-content:space-between"><b>${sent} sent · ${done} of ${tot} done</b><span class="mk-badge w">In progress</span></div>
+   <div class="mk-prog"><div style="width:${tot?done/tot*100:0}%"></div></div>
+   ${cur?`<div class="mk-target"><div><h4>${esc(cur.name)}</h4><p>${esc(cur.mobile)}</p></div><div class="mk-row"><button class="mk-btn o" onclick="mkQueue('skipped')">Skip</button><button class="mk-btn r" onclick="mkQueue('stop')">Said STOP</button><button class="mk-btn o" onclick="mkQueue('sent')">Mark as sent</button><button class="mk-btn g" onclick="mkQueue('open')">💬 Open WhatsApp &amp; Send</button></div></div>
+   <div class="mk-bubble" style="margin-bottom:10px">${esc(mkFill(c.text,cur,c))}</div>`:`<div class="mk-empty">All done ✓</div>`}
+   <div class="mk-list">${c.recipients.map(r=>`<span class="${r.status}">${esc(r.name.split(' ')[0])}</span>`).join('')}</div>
+   <div class="mk-row" style="margin-top:12px"><button class="mk-btn ${cur?'o':'p'}" onclick="mkFinish()">${cur?'Stop campaign here':'✓ Finish campaign'}</button></div></div></div>`;
+}
+function mkQueue(action){
+  let c=mkActiveCampaign();if(!c)return;let r=c.recipients.find(x=>x.status==='pending');if(!r)return;
+  if(action==='open'){let ph=waNumber(r.mobile);window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(mkFill(c.text,r,c)),'_blank');r.status='sent';r.at=new Date().toISOString()}
+  else if(action==='sent'){r.status='sent';r.at=new Date().toISOString()}
+  else if(action==='stop'){r.status='skipped';r.at=new Date().toISOString();if(!mkOptedOut(r.mobile))db.optOut.push({name:r.name,mobile:r.mobile,date:new Date().toLocaleDateString('en-IN')})}
+  else r.status='skipped';
+  if(!c.recipients.some(x=>x.status==='pending'))c.status='done';
+  save();mkInit();
+}
+function mkFinish(){let c=mkActiveCampaign();if(!c)return;c.recipients.forEach(r=>{if(r.status==='pending')r.status='skipped'});c.status='done';save();mkInit()}
+function mkCodeStats(code){if(!code)return{uses:0,sales:0};let s=db.sales.filter(x=>x.couponCode===code);return{uses:s.length,sales:s.reduce((a,x)=>a+(Number(x.total)||0),0)}}
+function mkRenderHistory(){
+  mkHist.innerHTML=db.campaigns.slice().reverse().map(c=>{let st=mkCodeStats(c.code),sent=c.recipients.filter(r=>r.status==='sent').length;
+    return `<tr><td data-label="Campaign"><b>${esc(c.name)}</b></td><td data-label="Date">${mkFmtDate(c.createdAt)}</td><td data-label="Group">${esc(c.group||'')}</td><td data-label="Sent">${sent} / ${c.recipients.length}</td><td data-label="Offer code">${esc(c.code||'Own codes')}</td><td data-label="Times used">${c.code?st.uses:'—'}</td><td data-label="Sales">${c.code?money(st.sales):'—'}</td><td data-label="Status"><span class="mk-badge ${c.status==='sending'?'w':'s'}">${c.status==='sending'?'Sending':'Done'}</span></td></tr>`}).join('')||'<tr><td colspan="8" class="mk-empty">No campaigns yet</td></tr>';
+}
+function mkRenderOpt(){mkOpt.innerHTML=db.optOut.map((o,i)=>`<tr><td data-label="Name">${esc(o.name)}</td><td data-label="Mobile">${esc(o.mobile)}</td><td data-label="Since">${esc(o.date)}</td><td data-label=""><button class="mk-btn o" style="padding:4px 10px;font-size:12px" onclick="mkRemoveOpt(${i})">Remove</button></td></tr>`).join('')||'<tr><td colspan="4" class="mk-empty">Nobody on this list</td></tr>'}
+function mkOptOutIdx(i){let c=(window.mk.list||[])[i];if(c)mkOptOutCustomer(c.name,c.mobile)}
+function mkOptOutCustomer(name,mobile){if(!confirm(name+' will not get any offers from now on. OK?'))return;if(!mkOptedOut(mobile))db.optOut.push({name,mobile,date:new Date().toLocaleDateString('en-IN')});save();mkInit()}
+function mkAddOpt(){let n=mkOptName.value.trim(),m=mkOptMobile.value.trim();if(!mkMobileKey(m))return alert('Enter a valid 10-digit mobile number');if(!mkOptedOut(m))db.optOut.push({name:n||'—',mobile:m,date:new Date().toLocaleDateString('en-IN')});mkOptName.value='';mkOptMobile.value='';save();mkInit()}
+function mkRemoveOpt(i){db.optOut.splice(i,1);save();mkInit()}
+function mkRenderStats(){
+  let contacts=mkCustomers().filter(c=>mkMobileKey(c.mobile)&&!mkOptedOut(c.mobile)).length,now=new Date(),sent=0;
+  db.campaigns.forEach(c=>c.recipients.forEach(r=>{if(r.status==='sent'&&r.at){let d=new Date(r.at);if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())sent++}}));
+  let codes=new Set(db.campaigns.map(c=>c.code).filter(Boolean)),used=0,sales=0;db.sales.forEach(s=>{if(s.couponCode&&codes.has(s.couponCode)){used++;sales+=Number(s.total)||0}});
+  mkStContacts.textContent=contacts;mkStSent.textContent=sent;mkStUsed.textContent=used;mkStSales.textContent=money(sales);
+}
+function mkExport(){
+  let list=mkSelected();if(!list.length)return alert('Select customers first.');
+  let rows=[['Name','Phone']].concat(list.map(c=>[c.name,'+'+waNumber(c.mobile)]));
+  let csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  let a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));a.download='IZYAN-customers-'+window.mk.group+'.csv';a.click();
+}
 // ================= Online Orders (website → Apps Script → here) =================
 window.onlineOrders=[];
 function ordersConfigured(){return !!((db.settings.ordersUrl||'').trim()&&(db.settings.ordersKey||'').trim())}
@@ -668,7 +873,7 @@ function couponFor(saleId,name){
   c={code,customer:String(name||'').trim(),saleId:saleId||'',issued:new Date().toLocaleDateString('en-IN'),validTill:d.toLocaleDateString('en-IN'),pct:LOYALTY_PCT,used:false};
   db.coupons.push(c);try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}scheduleCloudSync();return c;
 }
-function couponLookup(code){code=String(code||'').trim().toUpperCase();if(!code)return{err:'Enter a code'};let c=db.coupons.find(x=>x.code===code);if(!c)return{err:'Code not found'};if(c.used)return{err:'Code already used on '+(c.usedOn||'an earlier bill')};let t=parseBizDate(c.validTill);if(t&&new Date(new Date().toDateString())>t)return{err:'Code expired on '+c.validTill};return{c}}
+function couponLookup(code){code=String(code||'').trim().toUpperCase();if(!code)return{err:'Enter a code'};let c=db.coupons.find(x=>x.code===code);if(!c)return{err:'Code not found'};if(c.used&&!c.multi)return{err:'Code already used on '+(c.usedOn||'an earlier bill')};let t=parseBizDate(c.validTill);if(t&&new Date(new Date().toDateString())>t)return{err:'Code expired on '+c.validTill};return{c}}
 function tyCurrentCoupon(){return window.tyCoupon||null}
 const tyIds=['tyName','tyMobile','tyEmail','tyProducts','tyInvoice','tyAmount','tyNote','tyNextmsg'];
 function tyUpdate(){
