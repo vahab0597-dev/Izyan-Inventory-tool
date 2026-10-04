@@ -548,6 +548,7 @@ function saveProduct(id){
     sku:fsku.value.trim()||'SKU-'+Date.now().toString().slice(-6),
     name:fname.value.trim(),
     category,
+    size:(old&&old.size)||(category==='Attar'?'12ML':''),
     purchase:0,
     stock:qty,
     min
@@ -1121,6 +1122,17 @@ function applyVyaparImportV1(){
   scheduleCloudSync();
 }
 applyVyaparImportV1();
+function applyFixesOct4(){
+  if(db.settings.fixOct4V1||isFreshDb(db))return;
+  db.products.forEach(p=>{if(isAttar(p)&&!String(p.size||'').trim())p.size='12ML'});
+  if(!db.products.some(p=>String(p.name).trim().toLowerCase()==='cr7')){
+    let sku='IZY-CR7-001';if(db.products.some(p=>String(p.sku).toUpperCase()===sku))sku=nextSku('Attar');
+    db.products.push({id:'p'+Date.now()+Math.random().toString(36).slice(2,7),sku,name:'CR7',category:'Attar',size:'12ML',purchase:0,purchaseAmt:0,purchaseQty:1,selling:500,stock:50,min:1,stockG:50,minG:1,attar6:250,attar12:500,perfume50:650,perfume100:1300});
+  }
+  db.settings.fixOct4V1=new Date().toISOString();
+  persistLocal();scheduleCloudSync();
+}
+applyFixesOct4();
 {let before=JSON.stringify(db.sales.map(x=>x.date));normalizeAllDates();if(JSON.stringify(db.sales.map(x=>x.date))!==before)persistLocal()}
 renderAll();
 updateSafetyBanner();
