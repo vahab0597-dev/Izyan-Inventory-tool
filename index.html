@@ -1136,7 +1136,7 @@ applyFixesOct4();
 // New stock received 4 Oct 2026 (one-time add; skipped if a product with the same name already exists)
 function applyNewStockOct4(){
   if(db.settings.newStockOct4V1||isFreshDb(db))return;
-  const items=[['Summer Oud','SUMO',25,700],['Bin Shaikh','BINS',25,700],['Creed Aventus','CRAV',25,500],['Imperial Valley','IMPV',25,500],['Ombre Nomad','OMBN',25,600],['Dessert Oud','DSRO',50,600],['Sports Club','SPCL',50,500],['Izyan Oud','IZOUD',25,800],['Turkey Oud','TRKO',50,1100],['Izyan French SP','IZFSP',25,600]];
+  const items=[['Summer Oud','SUMO',25,700],['Bin Shaikh','BINS',25,700],['Creed Aventus','CRAV',25,500],['Imperial Valley','IMPV',25,500],['Ombre Nomad','OMBN',25,600],['Desert Oud','DSRO',50,600],['Sports Club','SPCL',50,500],['Izyan Oud','IZOUD',25,800],['Turkey Oud','TRKO',50,1100],['Izyan French SP','IZFSP',25,600]];
   let n=36,have=new Set(db.products.map(p=>String(p.name).trim().toLowerCase()));
   items.forEach(([name,code,g,a12],i)=>{if(have.has(name.toLowerCase()))return;let sku='IZY-'+code+'-'+String(n+i).padStart(3,'0'),p50=a12+150;
     db.products.push({id:'p'+Date.now()+i+Math.random().toString(36).slice(2,6),sku,name,category:'Attar',size:'12ML',purchase:0,purchaseAmt:0,purchaseQty:1,selling:a12,stock:g,min:1,stockG:g,minG:1,attar6:a12/2,attar12:a12,perfume50:p50,perfume100:p50*2})});
