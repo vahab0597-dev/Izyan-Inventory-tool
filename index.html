@@ -167,6 +167,7 @@
 </style>
 </head>
 <body>
+<div id="safetyBanner" style="display:none;position:sticky;top:0;z-index:999;padding:9px 14px;font:600 13px system-ui;color:#fff;text-align:center"></div>
 <aside class="sidebar">
 <div class="brand">IZYAN <b>Business Manager</b><small>Inventory • Billing • Accounts</small></div>
 <div class="topRight"><button class="curPage" id="curPage" onclick="show('dashboard',document.querySelector('.nav button'))" title="Go to Dashboard">🏠 Dashboard</button><button class="burgerBtn" id="burgerBtn" onclick="toggleMenu(event)" aria-label="Menu" aria-expanded="false">☰<span id="burgerDot" class="navCount" style="display:none"></span></button></div>
@@ -299,11 +300,24 @@ const demo={settings:{name:'IZYAN Attar & Perfumes',gst:'',mobile:'',email:'',ad
 {id:'p3',sku:'IZY-PF-003',name:'Armani Gold',category:'Perfume',size:'50ML',purchase:650,selling:1200,stock:0,min:0,recipe:{'50ML':[{ingredient:'Oud Royal',grams:12},{ingredient:'Alcohol',grams:38}],'100ML':[{ingredient:'Oud Royal',grams:24},{ingredient:'Alcohol',grams:76}]}},
 {id:'p4',sku:'IZY-RM-001',name:'Alcohol',category:'Raw Material',size:'',purchase:1,selling:0,stock:500,min:100,stockG:500,minG:100}],
 sales:[],purchases:[],returns:[],customers:[],suppliers:[],expenses:[],payments:[],seq:{sale:1,purchase:1,return:1,payment:1}};
+// ===== DATA SAFETY LAYER (added after cache-clear data loss) =====
+const IDB_NAME='izyan_bm_safe',IDB_STORE='kv';
+function idbOpen(){return new Promise((res,rej)=>{try{let r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>r.result.createObjectStore(IDB_STORE);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}})}
+async function idbPut(k,v){try{let d=await idbOpen();d.transaction(IDB_STORE,'readwrite').objectStore(IDB_STORE).put(v,k)}catch(e){}}
+async function idbGet(k){try{let d=await idbOpen();return await new Promise(r=>{let q=d.transaction(IDB_STORE).objectStore(IDB_STORE).get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)})}catch(e){return null}}
+// If localStorage was wiped but the IndexedDB mirror survived, restore from it automatically.
+(function(){let has=false;try{has=!!localStorage.getItem('izyan_bm_v9')}catch(e){}
+ if(!has&&!sessionStorage.getItem('izy_idb_tried')){sessionStorage.setItem('izy_idb_tried','1');idbGet('db').then(v=>{if(v){try{localStorage.setItem('izyan_bm_v9',v);location.reload()}catch(e){}}})}})();
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+function persistLocal(){let j=JSON.stringify(db);try{localStorage.setItem(KEY,j)}catch(e){}idbPut('db',j)}
+function isFreshDb(d){return !!(d.settings&&d.settings.freshSeed)}
+function _oldFresh(d){const demoNames=['Oud Royal','Musk Al Tahara','Armani Gold','Alcohol'];return !(d.sales||[]).length&&!(d.purchases||[]).length&&!(d.customers||[]).length&&!(d.expenses||[]).length&&(d.products||[]).length<=4&&(d.products||[]).every(p=>demoNames.includes(p.name))}
 let db=null;
 try{db=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
 if(!db){for(const k of LEGACY_KEYS){try{db=JSON.parse(localStorage.getItem(k)||'null');if(db)break}catch(e){}}}
-if(!db)db=JSON.parse(JSON.stringify(demo));
+let __seed=false;if(!db){db=JSON.parse(JSON.stringify(demo));__seed=true}
 db.settings=Object.assign({name:'IZYAN Attar & Perfumes',gst:'',mobile:'',email:'',address:'',accountHolder:'',bankName:'',accountNumber:'',ifsc:'',upiId:'',qrEnabled:true,qrMode:'total',sheetUrl:'',cloudUrl:''},db.settings||{});
+if(__seed)db.settings.freshSeed=true;
 db.products=db.products||[];db.sales=db.sales||[];db.purchases=db.purchases||[];db.returns=db.returns||[];db.customers=db.customers||[];db.suppliers=db.suppliers||[];db.expenses=db.expenses||[];db.payments=db.payments||[];db.seq=Object.assign({sale:1,purchase:1,return:1,payment:1},db.seq||{});db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];db.mkContacts=db.mkContacts||[];
 function sizeMl(p){return Number.parseFloat(String(p?.size||'').replace(/[^0-9.]/g,''))||0}
 function isAttar(p){return String(p?.category||'').toLowerCase()==='attar'}
@@ -323,7 +337,7 @@ function stockLabel(p){if(isAttar(p))return `${internalStock(p).toLocaleString('
 function stockShort(p){if(isAttar(p))return `${sellableUnits(p)} × ${p.size}`;if(isPerfume(p)&&hasRecipe(p))return 'Recipe';return `${internalStock(p)}`}
 function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function save(){localStorage.setItem(KEY,JSON.stringify(db));renderAll();scheduleCloudSync()}
+function save(){let j=JSON.stringify(db);try{localStorage.setItem(KEY,j)}catch(e){alert('Browser storage full/blocked! Download a backup now.')}idbPut('db',j);renderAll();scheduleCloudSync();updateSafetyBanner()}
 let cloudSyncTimer=null;
 function scheduleCloudSync(){if(!db.settings.cloudUrl)return;clearTimeout(cloudSyncTimer);cloudSyncTimer=setTimeout(pushToCloud,1500)}
 // Coupons, marketing campaigns and the do-not-message list have no sheet of their own in the cloud backup,
@@ -351,13 +365,14 @@ function mergeCloudExtras(cs){
   }
   Object.keys(db.settings).forEach(k=>{if(/^extData(_\d+|Parts)$/.test(k))delete db.settings[k]});
 }
-async function pushToCloud(){let url=(db.settings.cloudUrl||'').trim();if(!url)return;if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='Syncing to cloud…';try{let res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(cloudPayload())});let json=await res.json().catch(()=>({}));if(json&&json.ok===false)throw Error(json.error||'Unknown error from Apps Script');if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='✓ Last synced: '+new Date().toLocaleTimeString('en-IN')}catch(e){if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='Cloud sync failed (data is still saved locally; will retry on next change): '+e.message}}
-function saveCloudUrl(){db.settings.cloudUrl=(cloudUrl.value||'').trim();save();alert('Cloud backend URL saved.');if(db.settings.cloudUrl)cloudSyncNow()}
-function cloudSyncNow(){if(!db.settings.cloudUrl)return alert('Paste your Apps Script Web App URL first');clearTimeout(cloudSyncTimer);pushToCloud()}
-async function pullFromCloud(){
+async function pushToCloud(force){let url=(db.settings.cloudUrl||'').trim();if(!url)return;if(!force&&isFreshDb(db)&&!db.settings.cloudVerified){if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='⛔ Push blocked: this device has only demo/empty data. Use "Pull Latest from Cloud" first so the cloud data is not overwritten.';return}if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='Syncing to cloud…';try{let res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(cloudPayload())});let json=await res.json().catch(()=>({}));if(json&&json.ok===false)throw Error(json.error||'Unknown error from Apps Script');if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='✓ Last synced: '+new Date().toLocaleTimeString('en-IN');db.settings.lastCloudOk=Date.now();persistLocal();updateSafetyBanner()}catch(e){if(typeof cloudStatus!=='undefined'&&cloudStatus)cloudStatus.textContent='Cloud sync failed (data is still saved locally; will retry on next change): '+e.message}}
+function saveCloudUrl(){db.settings.cloudUrl=(cloudUrl.value||'').trim();let fresh=isFreshDb(db);persistLocal();idbPut('db',JSON.stringify(db));if(fresh&&db.settings.cloudUrl){alert('Cloud URL saved. This device has no data yet, so nothing was pushed. Now pulling your data FROM the cloud…');pullFromCloud(true);return}
+ renderAll();alert('Cloud backend URL saved.');if(db.settings.cloudUrl){db.settings.cloudVerified=true;cloudSyncNow()}}
+function cloudSyncNow(){if(!db.settings.cloudUrl)return alert('Paste your Apps Script Web App URL first');clearTimeout(cloudSyncTimer);if(isFreshDb(db)){if(!confirm('⚠️ This device has NO verified data (fresh/starter data only). Pushing will OVERWRITE your cloud backup with it.\n\nPress Cancel and use "Pull Latest from Cloud" instead, unless you really want to start over.\n\nOverwrite cloud anyway?'))return;db.settings.freshSeed=false;persistLocal();pushToCloud(true);return}pushToCloud()}
+async function pullFromCloud(skipConfirm){
   let url=(db.settings.cloudUrl||'').trim();
   if(!url)return alert('Paste your Apps Script Web App URL first');
-  if(!confirm('This will replace ALL local data on this device with the latest data from the cloud. Any changes made on this device since the last sync will be lost. Continue?'))return;
+  if(!(skipConfirm===true||isFreshDb(db))&&!confirm('This will replace ALL local data on this device with the latest data from the cloud. Any changes made on this device since the last sync will be lost. Continue?'))return;
   if(cloudStatus)cloudStatus.textContent='Pulling from cloud…';
   try{
     let sep=url.includes('?')?'&':'?';
@@ -376,14 +391,21 @@ async function pullFromCloud(){
     db.settings=Object.assign({},db.settings,d.settings||{},{cloudUrl:url});
     db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];db.mkContacts=db.mkContacts||[];mergeCloudExtras(d.settings||{});
     db.products.forEach(ensureInternalStock);
-    localStorage.setItem(KEY,JSON.stringify(db));
-    renderAll();
+    db.settings.cloudVerified=true;db.settings.freshSeed=false;db.settings.lastCloudOk=Date.now();localStorage.setItem(KEY,JSON.stringify(db));idbPut('db',JSON.stringify(db));
+    renderAll();updateSafetyBanner();
     if(cloudStatus)cloudStatus.textContent='✓ Pulled latest data from cloud at '+new Date().toLocaleTimeString('en-IN');
   }catch(e){
     if(cloudStatus)cloudStatus.textContent='Pull failed: '+e.message;
     alert('Failed to pull from cloud: '+e.message);
   }
 }
+function updateSafetyBanner(){let b=document.getElementById('safetyBanner');if(!b)return;let s=db.settings,now=Date.now(),day=864e5,msg='',col='#c0392b';
+ if(isFreshDb(db)&&!s.cloudUrl){msg='⚠️ No data on this device. If you had data before: Settings → paste Cloud URL → it will pull your data back. Or Restore a backup file.'}
+ else if(!s.cloudUrl){msg='⚠️ Cloud backup is OFF — your data lives only in this browser. Clearing cache will DELETE it. Settings → add Cloud URL, or download a backup.'}
+ else if(s.lastCloudOk&&now-s.lastCloudOk>2*day){msg='⚠️ Cloud last synced '+Math.floor((now-s.lastCloudOk)/day)+' days ago. Open Settings → Push Now.';col='#d68910'}
+ else if(!s.lastCloudOk){msg='⚠️ Cloud URL set but no successful sync yet. Settings → Push Now and check status.';col='#d68910'}
+ else if(!s.lastBackup||now-s.lastBackup>7*day){msg='ℹ️ File backup is '+(s.lastBackup?Math.floor((now-s.lastBackup)/day)+' days old':'never done')+'. Click to download a fresh backup.';col='#2471a3';b.onclick=()=>backup()}
+ if(!msg){b.style.display='none';return}b.style.background=col;b.style.display='block';b.textContent=msg;b.style.cursor=col==='#2471a3'?'pointer':'default'}
 function closeModal(){modal.classList.remove('show');if(window.__photoPreviewUrl){URL.revokeObjectURL(window.__photoPreviewUrl);window.__photoPreviewUrl=null}}
 function attarAndRawNames(){return db.products.filter(p=>isAttar(p)||isRaw(p)).map(p=>p.name)}
 function openPhotoStockIn(){
@@ -658,7 +680,7 @@ function mkSplit(g){
 }
 const MK_DEFAULT_WEB='https://vahab0597-dev.github.io/Izyan-Attar-Perfume/',MK_DEFAULT_IG='https://instagram.com/izyan.attar';
 function mkLinks(){return{web:db.settings.mkWebsite||MK_DEFAULT_WEB,ig:db.settings.mkInstagram||MK_DEFAULT_IG}}
-function mkSaveLinks(){db.settings.mkWebsite=mkWeb.value.trim();db.settings.mkInstagram=mkInsta.value.trim();try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}scheduleCloudSync();mkPreview()}
+function mkSaveLinks(){db.settings.mkWebsite=mkWeb.value.trim();db.settings.mkInstagram=mkInsta.value.trim();persistLocal();scheduleCloudSync();mkPreview()}
 // Reads the same published "Offers" sheet the website uses, so Marketing always shows the live website offer
 const MK_OFFERS_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vQMdOSPXvgALgLlTU107QpaxVYwZIEX1RJvSNxhztqZ50NEK1dU8FHDPiapt5mkAA/pub?gid=1355987088&single=true&output=csv';
 // The website's automatic free-gift rules (same as FREE_GIFT_OFFER on the website; ends 31 Oct 2026)
@@ -905,7 +927,7 @@ function openExpense(id){let e=id?db.expenses.find(x=>x.id===id):null;modalConte
 function saveExpense(id){let amount=+examt.value||0;if(!amount)return alert('Amount required');if(id){let e=db.expenses.find(x=>x.id===id);if(e){e.category=excat.value;e.description=exdesc.value;e.amount=amount;e.payment=expay.value}}else{db.expenses.push({id:'exp'+Date.now()+Math.random().toString(36).slice(2),date:new Date().toLocaleDateString('en-IN'),category:excat.value,description:exdesc.value,amount,payment:expay.value})}save();closeModal()}
 function deleteExpense(id){if(!confirm('Delete this expense?'))return;db.expenses=db.expenses.filter(x=>x.id!==id);save()}
 function saveSettings(){let upi=bizUpi.value.trim();if(upi&&(!/^[A-Za-z0-9._-]{2,256}@[A-Za-z0-9.-]{2,64}$/.test(upi)))return alert('Please enter a valid UPI ID, e.g. name@bank');db.settings={...db.settings,name:bizName.value.trim(),gst:bizGst.value.trim(),mobile:bizMobile.value.trim(),email:bizEmail.value.trim(),address:bizAddress.value.trim(),accountHolder:bizAccHolder.value.trim(),bankName:bizBankName.value.trim(),accountNumber:bizAccNo.value.trim(),ifsc:bizIfsc.value.trim().toUpperCase(),upiId:upi,qrEnabled:bizQrEnabled.checked,qrMode:bizQrMode.value,lowStockAttarG:+bizLowAttar.value||25,lowStockRawG:+bizLowRaw.value||200};save();alert('Business, bank & UPI settings saved')}
-function backup(){let b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='izyan-business-backup.json';a.click()}
+function backup(){db.settings.lastBackup=Date.now();persistLocal();updateSafetyBanner();let b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='izyan-business-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()}
 function restore(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.products||!x.sales)throw Error();db=x;db.settings=Object.assign({qrEnabled:true,qrMode:'total',sheetUrl:''},db.settings||{});db.products.forEach(ensureInternalStock);save();alert('Backup restored successfully')}catch(err){alert('Invalid backup file')}};r.readAsText(f)}
 function resetData(){if(confirm('Reset all data to demo data?')){db=JSON.parse(JSON.stringify(demo));save()}}
 function exportProducts(){let headers=['sku','name','category','purchase','attar6','attar12','perfume50','perfume100','selling','stock','min','stockG','minG'];let rows=db.products.map(x=>[x.sku,x.name,x.category,x.purchase,x.attar6,x.attar12,x.perfume50,x.perfume100,x.selling,x.stock,x.min,x.stockG,x.minG]);let csv=headers.join(',')+'\n'+rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');let b=new Blob([csv],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='izyan-products.csv';a.click()}
@@ -970,7 +992,7 @@ function couponFor(saleId,name){
   let code=couponCodeFor(name);
   let d=new Date();d.setDate(d.getDate()+LOYALTY_DAYS);
   c={code,customer:String(name||'').trim(),saleId:saleId||'',issued:new Date().toLocaleDateString('en-IN'),validTill:d.toLocaleDateString('en-IN'),pct:LOYALTY_PCT,used:false};
-  db.coupons.push(c);try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}scheduleCloudSync();return c;
+  db.coupons.push(c);persistLocal();scheduleCloudSync();return c;
 }
 function couponLookup(code){code=String(code||'').trim().toUpperCase();if(!code)return{err:'Enter a code'};let c=db.coupons.find(x=>x.code===code);if(!c)return{err:'Code not found'};if(c.used&&!c.multi)return{err:'Code already used on '+(c.usedOn||'an earlier bill')};let t=parseBizDate(c.validTill);if(t&&new Date(new Date().toDateString())>t)return{err:'Code expired on '+c.validTill};return{c}}
 function tyCurrentCoupon(){return window.tyCoupon||null}
@@ -1032,7 +1054,7 @@ function applyCostFixV1(){
   known.forEach(k=>{let p=findProductByName(k.name);if(p&&p.purchaseQty==null&&Number(p.purchase)===k.amt){p.purchaseAmt=k.amt;p.purchaseQty=k.qty;p.purchase=k.amt/k.qty}});
   recomputeAllSaleCosts();
   db.settings.costFixV1=new Date().toISOString();
-  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}
+  persistLocal()
   scheduleCloudSync();
 }
 function recomputeAllSaleCosts(){let alc=findProductByName('Alcohol');db.sales.forEach(s=>{let c=0;(s.items||[]).forEach(it=>{if(it.manual)return;let p=db.products.find(x=>x.id===it.productId);if(!p){c+=it.cost||0;return}let pc=Number(p.purchase)||0,cost=0;if(it.type==='Attar')cost=pc*it.qty*sizeMl(it);else if(it.type==='Perfume'){let{attarG,alcG}=perfumeSplit(it.qty,it.size);cost=pc*attarG+(Number(alc?.purchase)||0)*alcG}else if(it.type==='Raw Material')cost=pc*it.qty;else cost=pc*it.qty;it.cost=cost;c+=cost});s.cogs=c;s.profit=(s.total||0)-(s.tax||0)-c})}
@@ -1045,7 +1067,7 @@ function applyPriceFillV1(){
     if(!(Number(p.attar12)>0))p.attar12=a12;if(!(Number(p.attar6)>0))p.attar6=Math.round(p.attar12/2);
     if(!(Number(p.perfume50)>0))p.perfume50=p50;if(!(Number(p.perfume100)>0))p.perfume100=p.perfume50*2;p.selling=p.attar12});
   db.settings.priceFillV1=new Date().toISOString();
-  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}
+  persistLocal()
   scheduleCloudSync();
 }
 applyCostFixV1();
@@ -1056,7 +1078,7 @@ function applyNewArrivalsV1(){
   const NEW=[['Savage Dior',500,650],['Khamraha OG',500,650],['Hawas Intense',500,650]];
   NEW.forEach(([name,a12,p50])=>{if(findProductByName(name))return;db.products.push({id:'p'+Date.now()+Math.random().toString(36).slice(2,7),sku:nextSku('Attar'),name,category:'Attar',size:'12ML',purchase:0,attar6:Math.round(a12/2),attar12:a12,perfume50:p50,perfume100:p50*2,selling:a12,stock:25,min:1,stockG:25,minG:1})});
   db.settings.newArrivalsV1=new Date().toISOString();
-  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}
+  persistLocal()
   scheduleCloudSync();
 }
 applyNewArrivalsV1();
@@ -1065,7 +1087,7 @@ function applyPhoneFixV1(){
   if(db.settings.phoneFixV1)return;
   if(String(db.settings.mobile||'').replace(/\D/g,'').endsWith('9168899668'))db.settings.mobile='9136466949';
   db.settings.phoneFixV1=new Date().toISOString();
-  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}
+  persistLocal()
   scheduleCloudSync();
 }
 applyPhoneFixV1();
@@ -1088,10 +1110,12 @@ function applyVyaparImportV1(){
   db.sales.sort((a,b)=>(parseBizDate(a.date)||0)-(parseBizDate(b.date)||0));
   recomputeAllSaleCosts();
   db.settings.vyaparImportV1=new Date().toISOString();
-  try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}
+  persistLocal()
   scheduleCloudSync();
 }
 applyVyaparImportV1();
 renderAll();
+updateSafetyBanner();
+setInterval(updateSafetyBanner,600000);
 </script>
 </body></html>
