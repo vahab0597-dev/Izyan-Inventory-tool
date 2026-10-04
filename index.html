@@ -310,7 +310,10 @@ async function idbGet(k){try{let d=await idbOpen();return await new Promise(r=>{
  if(!has&&!sessionStorage.getItem('izy_idb_tried')){sessionStorage.setItem('izy_idb_tried','1');idbGet('db').then(v=>{if(v){try{localStorage.setItem('izyan_bm_v9',v);location.reload()}catch(e){}}})}})();
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 function persistLocal(){let j=JSON.stringify(db);try{localStorage.setItem(KEY,j)}catch(e){}idbPut('db',j)}
-function isFreshDb(d){return !!(d.settings&&d.settings.freshSeed)}
+function isFreshDb(d){if(d.settings&&d.settings.freshSeed)return true;if(d.settings&&d.settings.cloudVerified)return false;
+ // Starter data built into the app (demo products + Vyapar import) = nothing the user entered on this device yet
+ const seed=['Oud Royal','Musk Al Tahara','Armani Gold','Alcohol','Savage Dior','Khamraha OG','Hawas Intense'];
+ return !(d.purchases||[]).length&&!(d.expenses||[]).length&&!(d.payments||[]).length&&!(d.returns||[]).length&&!(d.suppliers||[]).length&&(d.sales||[]).every(x=>x.imported)&&(d.products||[]).every(p=>seed.includes(p.name))}
 function _oldFresh(d){const demoNames=['Oud Royal','Musk Al Tahara','Armani Gold','Alcohol'];return !(d.sales||[]).length&&!(d.purchases||[]).length&&!(d.customers||[]).length&&!(d.expenses||[]).length&&(d.products||[]).length<=4&&(d.products||[]).every(p=>demoNames.includes(p.name))}
 let db=null;
 try{db=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
@@ -390,7 +393,7 @@ async function pullFromCloud(skipConfirm){
     db.payments=d.payments||[];
     db.settings=Object.assign({},db.settings,d.settings||{},{cloudUrl:url});
     db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];db.mkContacts=db.mkContacts||[];mergeCloudExtras(d.settings||{});
-    db.products.forEach(ensureInternalStock);
+    db.products.forEach(ensureInternalStock);normalizeAllDates();
     db.settings.cloudVerified=true;db.settings.freshSeed=false;db.settings.lastCloudOk=Date.now();localStorage.setItem(KEY,JSON.stringify(db));idbPut('db',JSON.stringify(db));
     renderAll();updateSafetyBanner();
     if(cloudStatus)cloudStatus.textContent='✓ Pulled latest data from cloud at '+new Date().toLocaleTimeString('en-IN');
@@ -473,7 +476,11 @@ function lowLimit(p){let m=internalMin(p);if(isAttar(p))return Math.max(m,Number
 function isLow(p){return internalStock(p)<=lowLimit(p)}
 function stockValue(){return db.products.reduce((s,p)=>s+(p.purchase||0)*internalStock(p),0)}
 // ---- Dates & report periods (dates are stored as d/m/yyyy, en-IN) ----
-function parseBizDate(d){let m=String(d||'').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);return m?new Date(+m[3],+m[2]-1,+m[1]):null}
+function parseBizDate(d){let m=String(d||'').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);if(/^\d{4}-\d{2}-\d{2}/.test(String(d||''))){let x=new Date(d);if(!isNaN(x))return new Date(x.getFullYear(),x.getMonth(),x.getDate())}return null}
+// Google Sheets turns "20/7/2026" cells into real dates, which come back from the cloud as ISO text ("2026-07-19T18:30:00.000Z").
+// The app stores dates as d/m/yyyy, so convert them back on load and after every pull.
+function normBizDate(v){if(v&&typeof v==='string'&&/^\d{4}-\d{2}-\d{2}T/.test(v)){let d=new Date(v);if(!isNaN(d))return d.toLocaleDateString('en-IN')}return v}
+function normalizeAllDates(){['sales','purchases','returns','payments','expenses'].forEach(k=>(db[k]||[]).forEach(x=>{if(x)x.date=normBizDate(x.date)}));(db.coupons||[]).forEach(c=>{c.issued=normBizDate(c.issued);c.validTill=normBizDate(c.validTill)})}
 function periodRange(key){let n=new Date(),t=new Date(n.getFullYear(),n.getMonth(),n.getDate());if(key==='today')return[t,t];if(key==='month')return[new Date(n.getFullYear(),n.getMonth(),1),t];if(key==='lastmonth')return[new Date(n.getFullYear(),n.getMonth()-1,1),new Date(n.getFullYear(),n.getMonth(),0)];if(key==='custom'){let f=document.getElementById('rpFrom')?.value,to=document.getElementById('rpTo')?.value;return[f?new Date(f+'T00:00:00'):null,to?new Date(to+'T00:00:00'):null]}return[null,null]}
 function inRange(d,r){if(!r||(!r[0]&&!r[1]))return true;let x=parseBizDate(d);if(!x)return false;return(!r[0]||x>=r[0])&&(!r[1]||x<=r[1])}
 function totals(range){let S=db.sales.filter(x=>inRange(x.date,range)),R=db.returns.filter(x=>inRange(x.date,range)),E=db.expenses.filter(x=>inRange(x.date,range)),P=db.purchases.filter(x=>inRange(x.date,range));let sales=S.reduce((s,x)=>s+(x.total||0),0),tax=S.reduce((s,x)=>s+(x.tax||0),0),cogs=S.reduce((s,x)=>s+(x.cogs||0),0),returns=R.reduce((s,x)=>s+(x.refund||0),0),returnedCost=R.reduce((s,x)=>s+(x.cost||0),0),gross=sales-tax-cogs-returns+returnedCost,exp=E.reduce((s,x)=>s+(x.amount||0),0);return {sales,tax,cogs:cogs-returnedCost,returns,gross,exp,net:gross-exp,purchases:P.reduce((s,x)=>s+(x.total||0),0),count:S.length,salesList:S}}
@@ -1114,6 +1121,7 @@ function applyVyaparImportV1(){
   scheduleCloudSync();
 }
 applyVyaparImportV1();
+{let before=JSON.stringify(db.sales.map(x=>x.date));normalizeAllDates();if(JSON.stringify(db.sales.map(x=>x.date))!==before)persistLocal()}
 renderAll();
 updateSafetyBanner();
 setInterval(updateSafetyBanner,600000);
