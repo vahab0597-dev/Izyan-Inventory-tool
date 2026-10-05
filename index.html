@@ -99,7 +99,7 @@
 .mk-empty{padding:18px;text-align:center;color:var(--mk-muted);font-size:13.5px}
 @media(max-width:768px){.mk-work{grid-template-columns:1fr}.mk-chips,.mk-tpls{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.mk-stack thead{display:none}.mk-stack,.mk-stack tbody,.mk-stack tr,.mk-stack td{display:block;width:100%}.mk-stack tr{margin-bottom:10px;border:1px solid var(--mk-border);border-radius:8px;padding:6px;background:#fff}.mk-stack td{display:flex;justify-content:space-between;gap:10px;text-align:right;padding:5px 8px;border:0;border-bottom:1px solid #f3f4f6}.mk-stack td:last-child{border-bottom:0}.mk-stack td::before{content:attr(data-label);font-weight:650;color:var(--mk-muted);text-align:left}}
-.obDate td{background:#f6f2ea;color:#7a5c1e;font-weight:800;font-size:12.5px;letter-spacing:.03em;padding:8px 12px!important}.obItem{display:block;line-height:1.55}.obItem small{color:#6b7280}.obTag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:4px}.obTag.a{background:#fdf3dc;color:#8a5a00}.obTag.p{background:#e8f0fe;color:#1d4ed8}.obNote{display:block;color:#6b7280;font-size:12px;margin-top:3px}.obActs{white-space:nowrap}.obActs .btn{margin:2px}
+.obDate td{background:#f6f2ea;color:#7a5c1e;font-weight:800;font-size:12.5px;letter-spacing:.03em;padding:8px 12px!important}.obItem{display:block;line-height:1.55}.obItem small{color:#6b7280}.obTag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:4px}.obTag.a{background:#fdf3dc;color:#8a5a00}.obTag.p{background:#e8f0fe;color:#1d4ed8}.obNote{display:block;color:#6b7280;font-size:12px;margin-top:3px}.obActs{white-space:nowrap}.obWa{font-size:12.5px!important;padding:6px 10px!important;color:#15803d!important}.obDel{color:#374151!important}.obActs .btn{margin:2px}
 @media(max-width:850px){.cards.obCards{grid-template-columns:1fr 1fr!important;gap:10px}.obCards .card{padding:12px}#obSearch{flex:1 1 100%}.obTable thead{display:none}.obTable,.obTable tbody,.obTable tr,.obTable td{display:block;width:100%;box-sizing:border-box}.obTable tr:not(.obDate){border-bottom:1px solid #e5e7eb;padding:10px 4px}.obTable td{padding:3px 8px!important;border:0!important}.obTable tr:not(.obDate) td:first-child{color:#6b7280;font-size:12px}.obActs{white-space:normal;padding-top:8px!important}.obDate td{border-radius:8px}}
 .navCount{display:inline-block;min-width:20px;padding:1px 7px;margin-left:4px;border-radius:999px;background:#dc2626;color:#fff;font-size:11.5px;font-weight:800;line-height:18px;text-align:center}
 .ordItems{margin:0;padding-left:16px;font-size:12.5px;line-height:1.45}.ordItems li.gift{color:#15803d;font-weight:600;list-style:'🎁 '}
@@ -220,7 +220,7 @@
 
 <section id="orderbook" class="section"><div class="top"><div><h1>Order Book</h1><p>Orders you take by phone, WhatsApp or in person — write now, bill later</p></div><button class="btn" onclick="openBookOrder()">+ New Order</button></div>
 <div class="cards obCards"><div class="card"><div class="label">Pending Orders</div><div class="value" id="obPendCount">0</div><div class="sub" id="obPendValue">₹0 to bill</div></div><div class="card"><div class="label">Today's Orders</div><div class="value" id="obTodayCount">0</div><div class="sub">written today</div></div><div class="card"><div class="label">This Month</div><div class="value" id="obMonth">0</div><div class="sub" id="obMonthValue">₹0</div></div><div class="card"><div class="label">Billed This Month</div><div class="value" id="obBilled">0</div><div class="sub">converted to invoice</div></div></div>
-<div class="toolbar" style="margin-top:14px"><input id="obSearch" class="search" placeholder="Search customer, mobile, product…" oninput="renderOrderBook()"><select id="obStatus" class="search" style="max-width:190px" onchange="renderOrderBook()"><option value="Pending">Pending (to bill)</option><option value="Billed">Billed</option><option value="Cancelled">Cancelled</option><option value="all">All orders</option></select><select id="obPeriod" class="search" style="max-width:170px" onchange="renderOrderBook()"><option value="all">All dates</option><option value="today">Today</option><option value="week">Last 7 days</option><option value="month">This month</option><option value="lastmonth">Last month</option></select></div>
+<div class="toolbar" style="margin-top:14px"><input id="obSearch" class="search" placeholder="Search customer, mobile, product, AWB…" oninput="renderOrderBook()"><select id="obStatus" class="search" style="max-width:190px" onchange="renderOrderBook()"><option value="Pending">Pending (to bill)</option><option value="Billed">Billed</option><option value="Cancelled">Cancelled</option><option value="all">All orders</option></select><select id="obPeriod" class="search" style="max-width:170px" onchange="renderOrderBook()"><option value="all">All dates</option><option value="today">Today</option><option value="week">Last 7 days</option><option value="month">This month</option><option value="lastmonth">Last month</option></select></div>
 <div class="notice">Writing an order here does <b>not</b> change stock. Stock reduces only when you press <b>Create Bill</b> and save the invoice.</div>
 <div class="panel"><div class="tablewrap"><table class="table obTable"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody id="obRows"></tbody></table></div></div></section>
 <section id="orders" class="section"><div class="top"><div><h1>Online Orders</h1><p>Orders placed on the IZYAN website (“Order on WhatsApp”)</p></div><button class="btn" onclick="fetchOnlineOrders()">⟳ Refresh</button></div>
@@ -1139,15 +1139,18 @@ function renderOrderBook(){
   obBilled.textContent=mo.filter(o=>o.status==='Billed').length;
   let nb=document.getElementById('navBookCount');if(nb){nb.textContent=pend.length;nb.style.display=pend.length?'inline-block':'none'}
   let st=obStatus.value,q=(obSearch.value||'').trim().toLowerCase(),r=obPeriodRange(obPeriod.value);
-  let list=all.filter(o=>(st==='all'||o.status===st)&&(!r||inRange(o.date,r))&&(!q||(o.customer+' '+(o.mobile||'')+' '+o.no+' '+(o.note||'')+' '+(o.items||[]).map(x=>x.name+' '+x.type).join(' ')).toLowerCase().includes(q)));
+  let list=all.filter(o=>(st==='all'||o.status===st)&&(!r||inRange(o.date,r))&&(!q||(o.customer+' '+(o.mobile||'')+' '+o.no+' '+(o.note||'')+' '+(o.awb||'')+' '+(o.courier||'')+' '+(o.items||[]).map(x=>x.name+' '+x.type).join(' ')).toLowerCase().includes(q)));
   list.sort((a,b)=>(parseBizDate(b.date)-parseBizDate(a.date))||((b.created||0)-(a.created||0)));
   let html='',last='';
   list.forEach(o=>{
     if(o.date!==last){last=o.date;let d=parseBizDate(o.date),cnt=list.filter(x=>x.date===o.date).length;html+=`<tr class="obDate"><td colspan="6">${d?d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):esc(o.date)}${o.date===today?' · Today':''} — ${cnt} order${cnt>1?'s':''}</td></tr>`}
-    let acts=o.status==='Pending'?`<button class="btn" onclick="billBookOrder('${o.id}')">Create Bill</button><button class="btn light" onclick="openBookOrder('${o.id}')">Edit</button><button class="btn light" style="color:#c0392b" onclick="setBookStatus('${o.id}','Cancelled')">Cancel</button>`:
+    let wa=o.status==='Cancelled'?'':`<button class="btn light obWa" onclick="obSendReceived('${o.id}')" title="WhatsApp: order received">💬 Received${o.msgReceived?' ✓':''}</button><button class="btn light obWa" onclick="openDispatch('${o.id}')" title="Add courier / AWB and send WhatsApp">🚚 Dispatch${o.msgDispatched?' ✓':''}</button>`;
+    let acts=o.status==='Pending'?`<button class="btn" onclick="billBookOrder('${o.id}')">Create Bill</button><button class="btn light" onclick="openBookOrder('${o.id}')">Edit</button><button class="btn light" style="color:#c0392b" onclick="setBookStatus('${o.id}','Cancelled')">Cancel</button><br>${wa}`:
       o.status==='Cancelled'?`<button class="btn light" onclick="setBookStatus('${o.id}','Pending')">Reopen</button><button class="btn light" style="color:#c0392b" onclick="deleteBookOrder('${o.id}')">Delete</button>`:
-      `<span class="sub">${esc(o.invoice||'')}</span>`;
-    html+=`<tr><td><b>${esc(o.no)}</b></td><td><b>${esc(o.customer)}</b>${o.mobile?`<br><span class="sub">${esc(o.mobile)}</span>`:''}</td><td>${(o.items||[]).map(obItemHtml).join('')}${o.note?`<span class="obNote">📝 ${esc(o.note)}</span>`:''}</td><td><b>${money(obTotal(o))}</b></td><td>${obStatusBadge(o.status)}</td><td class="obActs">${acts}</td></tr>`;
+      `<span class="sub">${esc(o.invoice||'')}</span><br>${wa}`;
+    let dl=o.delivery==='Courier'?`🚚 Courier${o.courier?' · '+esc(o.courier):''}${o.awb?' · AWB <b>'+esc(o.awb)+'</b>':' · AWB pending'}`:`🛵 Self delivery`;
+    dl+=o.dispatched?` · <span style="color:#15803d;font-weight:700">Dispatched ${esc(o.dispatched)}</span>`:` · deliver ${obWhen(o.days!=null?o.days:2)}`;
+    html+=`<tr><td><b>${esc(o.no)}</b></td><td><b>${esc(o.customer)}</b>${o.mobile?`<br><span class="sub">${esc(o.mobile)}</span>`:''}</td><td>${(o.items||[]).map(obItemHtml).join('')}${o.note?`<span class="obNote">📝 ${esc(o.note)}</span>`:''}${o.status!=='Cancelled'?`<span class="obNote obDel">${dl}</span>`:''}</td><td><b>${money(obTotal(o))}</b></td><td>${obStatusBadge(o.status)}</td><td class="obActs">${acts}</td></tr>`;
   });
   rows.innerHTML=html||`<tr><td colspan="6" class="empty">${all.length?'No orders match these filters':'No orders yet — press “+ New Order” to write the first one'}</td></tr>`;
 }
@@ -1158,10 +1161,13 @@ function openBookOrder(id){
   modalContent.innerHTML=`<h2>${o?'Edit Order '+esc(o.no):'New Order'}</h2><div class="formgrid"><div class="field"><label>Order Date</label><input id="obDate" type="date" value="${obDmyToIso(o?o.date:obToday())}"></div><div class="field"><label>Customer Name</label><input id="obCust" list="obCustList" value="${esc(o?o.customer:'')}" placeholder="Type or pick a customer" oninput="obCustPicked()"><datalist id="obCustList">${custs}</datalist></div><div class="field"><label>Mobile (optional)</label><input id="obMob" inputmode="tel" value="${esc(o?o.mobile||'':'')}"></div></div>
   <div class="panel" style="margin-top:14px;padding:12px"><div class="formgrid"><div class="field"><label>Product</label><select id="obProd" onchange="obProdChanged()"><option value="">Select product…</option>${obSellable().map(x=>`<option value="${x.i}">${esc(x.p.name)}</option>`).join('')}</select></div><div class="field"><label>Attar / Perfume</label><select id="obType" onchange="obTypeChanged()"><option>Attar</option><option>Perfume</option></select></div><div class="field"><label>Size</label><select id="obSize" onchange="obSizeChanged()"></select></div><div class="field"><label>Qty</label><input id="obQty" type="number" min="1" value="1"></div><div class="field"><label>Rate (₹ each)</label><input id="obRate" type="number" min="0" placeholder="auto"></div><div class="field" style="align-self:end"><button class="btn" onclick="obAddItem()">+ Add Item</button></div></div>
   <div class="tablewrap"><table class="table"><thead><tr><th>Product</th><th>Type</th><th>Size</th><th>Qty</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="obItemsRows"></tbody></table></div><div style="text-align:right;font-weight:800;margin-top:8px">Total: <span id="obItemsTotal">₹0</span></div></div>
+  <div class="formgrid" style="margin-top:12px"><div class="field"><label>Delivery</label><select id="obDel" onchange="obDelChanged()"><option value="Self" ${o&&o.delivery==='Courier'?'':'selected'}>🛵 Self delivery</option><option value="Courier" ${o&&o.delivery==='Courier'?'selected':''}>🚚 Courier</option></select></div><div class="field"><label>Deliver within (days)</label><input id="obDays" type="number" min="0" max="30" value="${o&&o.days!=null?o.days:2}"></div><div class="field obCourierF"><label>Courier name</label><input id="obCourier" value="${esc(o?o.courier||'':'')}" placeholder="e.g. DTDC, Delhivery, India Post"></div><div class="field obCourierF"><label>AWB / Tracking No.</label><input id="obAwb" value="${esc(o?o.awb||'':'')}" placeholder="add when shipped"></div></div>
   <div class="formgrid" style="margin-top:12px"><div class="field full"><label>Note (optional)</label><input id="obNoteIn" value="${esc(o?o.note||'':'')}" placeholder="e.g. deliver Saturday, advance ₹200 received, gift pack"></div></div>
+  ${o?'':'<label style="display:flex;gap:8px;align-items:center;margin-top:12px;font-weight:600"><input type="checkbox" id="obSendNow" checked style="width:auto"> Send “order received” message on WhatsApp after saving</label>'}
   <div class="actions"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveBookOrder()">${o?'Save Changes':'Save Order'}</button></div>`;
-  modal.classList.add('show');obTypeChanged();obRenderItems();
+  modal.classList.add('show');obTypeChanged();obRenderItems();obDelChanged();
 }
+function obDelChanged(){let c=obDel.value==='Courier';document.querySelectorAll('.obCourierF').forEach(f=>f.style.display=c?'':'none')}
 function obCustPicked(){let c=db.customers.find(x=>x.name.trim().toLowerCase()===obCust.value.trim().toLowerCase());if(c&&c.mobile&&!obMob.value)obMob.value=c.mobile}
 function obProdChanged(){let p=db.products[+obProd.value];if(!p)return;obType.innerHTML=isPerfume(p)?'<option>Perfume</option>':'<option>Attar</option><option>Perfume</option>';obTypeChanged()}
 function obTypeChanged(){obSize.innerHTML=(obType.value==='Perfume'?PERFUME_SIZES.map(s=>`<option ${s==='50ML'?'selected':''}>${s}</option>`):ATTAR_SIZES.map(s=>`<option ${s==='12ML'?'selected':''}>${s}</option>`)).join('');obSizeChanged()}
@@ -1178,10 +1184,41 @@ function obRenderItems(){obItemsRows.innerHTML=window.obItems.map((x,i)=>`<tr><t
 function saveBookOrder(){
   let name=obCust.value.trim();if(!name)return alert('Enter customer name');
   if(!window.obItems.length)return alert('Add at least one product');
-  let now=Date.now(),date=obIsoToDmy(obDate.value),data={date,customer:name,mobile:obMob.value.trim(),items:window.obItems,note:obNoteIn.value.trim(),updated:now};
+  let now=Date.now(),date=obIsoToDmy(obDate.value),days=Math.max(0,Math.round(+obDays.value||0)),del=obDel.value,data={date,customer:name,mobile:obMob.value.trim(),items:window.obItems,note:obNoteIn.value.trim(),delivery:del,days,courier:del==='Courier'?obCourier.value.trim():'',awb:del==='Courier'?obAwb.value.trim():'',updated:now};
   if(window.obEditId){let o=db.orderBook.find(x=>x.id===window.obEditId);if(o)Object.assign(o,data)}
   else db.orderBook.push(Object.assign({id:'ob'+now+Math.random().toString(36).slice(2,6),no:obNextNo(),status:'Pending',created:now},data));
+  let sendNow=document.getElementById('obSendNow')?.checked,newId=window.obEditId?null:db.orderBook[db.orderBook.length-1].id;
   save();closeModal();
+  if(sendNow&&newId){if(data.mobile)obSendReceived(newId);else alert('Order saved. No mobile number, so the WhatsApp message was not sent.')}
+}
+// ---- WhatsApp messages to the customer ----
+function obWhen(days){return days<=0?'today':days===1?'by tomorrow':`within the next ${days} days`}
+function obItemsText(o){return (o.items||[]).map((x,i)=>`${i+1}. ${x.name} – ${x.type} ${x.size} × ${x.qty}${x.rate?' – '+money(x.rate*x.qty):''}`).join('\n')}
+function obShopName(){return db.settings.name||'IZYAN Attar & Perfumes'}
+function obOpenWa(o,text){let ph=waNumber(o.mobile);if(!ph||ph.length<12){alert('No valid mobile number on this order. Press Edit and add the customer\'s mobile first.');return false}window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(text),'_blank');return true}
+function obSendReceived(id){
+  let o=db.orderBook.find(x=>x.id===id);if(!o)return;let d=o.days!=null?o.days:2,courier=o.delivery==='Courier';
+  let text=`Assalamu Alaikum ${o.customer} 🌙\n\nThank you for your order with ${obShopName()} ✅\nOrder No: ${o.no}\n\n${obItemsText(o)}\nTotal: ${money(obTotal(o))}\n\n`+
+    (courier?`Your order has been received and will be dispatched by courier ${obWhen(d)}. We will share the tracking (AWB) number as soon as it is shipped. 🚚`:`Your order has been received and will be delivered ${obWhen(d)}. 🛵`)+
+    `\n\nFor any query, just reply to this message.\n— ${obShopName()}`;
+  if(obOpenWa(o,text)){o.msgReceived=obToday();o.updated=Date.now();save()}
+}
+function openDispatch(id){
+  let o=db.orderBook.find(x=>x.id===id);if(!o)return;
+  modalContent.innerHTML=`<h2>Dispatch ${esc(o.no)} — ${esc(o.customer)}</h2><div class="formgrid"><div class="field"><label>Delivery</label><select id="obDel" onchange="obDelChanged()"><option value="Self" ${o.delivery==='Courier'?'':'selected'}>🛵 Self delivery</option><option value="Courier" ${o.delivery==='Courier'?'selected':''}>🚚 Courier</option></select></div><div class="field"><label>Reaches in (days)</label><input id="obDays" type="number" min="0" max="30" value="${o.delivery==='Courier'?(o.days!=null?o.days:2):0}"></div><div class="field obCourierF"><label>Courier name</label><input id="obCourier" value="${esc(o.courier||'')}" placeholder="e.g. DTDC, Delhivery, India Post"></div><div class="field obCourierF"><label>AWB / Tracking No.</label><input id="obAwb" value="${esc(o.awb||'')}"></div><div class="field full obCourierF"><label>Tracking link (optional)</label><input id="obTrack" value="${esc(o.trackUrl||'')}" placeholder="paste the courier tracking page link"></div></div>
+  <div class="notice" style="margin-top:10px">Saves the delivery details and opens WhatsApp with the “shipped / out for delivery” message for the customer.</div>
+  <div class="actions"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn light" onclick="saveDispatch('${o.id}',false)">Save only</button><button class="btn" onclick="saveDispatch('${o.id}',true)">Save &amp; Send on WhatsApp</button></div>`;
+  modal.classList.add('show');obDelChanged();
+}
+function saveDispatch(id,send){
+  let o=db.orderBook.find(x=>x.id===id);if(!o)return;let courier=obDel.value==='Courier';
+  if(courier&&!obAwb.value.trim())return alert('Enter the AWB / tracking number');
+  o.delivery=obDel.value;o.days=Math.max(0,Math.round(+obDays.value||0));o.courier=courier?obCourier.value.trim():'';o.awb=courier?obAwb.value.trim():'';o.trackUrl=courier?obTrack.value.trim():'';
+  o.dispatched=obToday();o.updated=Date.now();save();closeModal();
+  if(!send)return;
+  let text=courier?`Assalamu Alaikum ${o.customer} 🌙\n\nGood news! Your order ${o.no} from ${obShopName()} has been shipped 🚚\n\n${o.courier?'Courier: '+o.courier+'\n':''}AWB / Tracking No: ${o.awb}${o.trackUrl?'\nTrack here: '+o.trackUrl:''}\n\nIt should reach you ${obWhen(o.days)}.\n\nThank you for shopping with us! 🤍\n— ${obShopName()}`
+    :`Assalamu Alaikum ${o.customer} 🌙\n\nYour order ${o.no} from ${obShopName()} is out for delivery ${o.days<=0?'today':obWhen(o.days)} 🛵\n\nPlease keep your phone handy — we'll call you on arrival.\n\nThank you for shopping with us! 🤍\n— ${obShopName()}`;
+  if(obOpenWa(o,text)){o.msgDispatched=obToday();o.updated=Date.now();save()}
 }
 function setBookStatus(id,status){let o=db.orderBook.find(x=>x.id===id);if(!o)return;if(status==='Cancelled'&&!confirm(`Cancel order ${o.no} for ${o.customer}?`))return;o.status=status;o.updated=Date.now();save()}
 function deleteBookOrder(id){let o=db.orderBook.find(x=>x.id===id);if(!o)return;if(!confirm(`Delete order ${o.no} permanently?`))return;db.orderBook=db.orderBook.filter(x=>x.id!==id);save()}
