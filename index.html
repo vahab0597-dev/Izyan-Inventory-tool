@@ -400,9 +400,9 @@ async function pullFromCloud(skipConfirm){
     db.suppliers=d.suppliers||[];
     db.expenses=d.expenses||[];
     db.payments=d.payments||[];
-    db.settings=Object.assign({},db.settings,d.settings||{},{cloudUrl:url});
+    db.settings=Object.assign({},db.settings,d.settings||{},{cloudUrl:url});if(!(d.settings&&d.settings.payAllocV1))delete db.settings.payAllocV1;
     db.coupons=db.coupons||[];db.campaigns=db.campaigns||[];db.optOut=db.optOut||[];db.mkContacts=db.mkContacts||[];db.orderBook=db.orderBook||[];mergeCloudExtras(d.settings||{});
-    db.products.forEach(ensureInternalStock);normalizeAllDates();
+    db.products.forEach(ensureInternalStock);normalizeAllDates();if(migratePaymentAllocation())scheduleCloudSync();
     db.settings.cloudVerified=true;db.settings.freshSeed=false;db.settings.lastCloudOk=Date.now();localStorage.setItem(KEY,JSON.stringify(db));idbPut('db',JSON.stringify(db));
     renderAll();updateSafetyBanner();
     if(cloudStatus)cloudStatus.textContent='✓ Pulled latest data from cloud at '+new Date().toLocaleTimeString('en-IN');
@@ -948,7 +948,20 @@ function findProductByName(name){let n=String(name||'').trim().toLowerCase();ret
 function openPerson(type){let customer=type==='customer';modalContent.innerHTML=`<h2>Add ${customer?'Customer':'Supplier'}</h2><div class="formgrid"><div class="field"><label>Name</label><input id="pnm"></div><div class="field"><label>Mobile</label><input id="pmo"></div><div class="field full"><label>Address</label><textarea id="pad"></textarea></div></div><div class="actions"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="savePerson('${type}')">Save</button></div>`;modal.classList.add('show')}
 function savePerson(type){let name=pnm.value.trim();if(!name)return alert('Name required');if(type==='customer')db.customers.push({id:'c'+Date.now(),name,mobile:pmo.value,address:pad.value,purchases:0,received:0,outstanding:0});else db.suppliers.push({id:'s'+Date.now(),name,mobile:pmo.value,address:pad.value,purchases:0,paid:0,payable:0});save();closeModal()}
 function openPayment(type,id){let customer=type==='in',list=customer?db.customers:db.suppliers,obj=list.find(x=>x.id===id);modalContent.innerHTML=`<h2>${customer?'Receive Customer Payment':'Pay Supplier'}</h2><div class="formgrid"><div class="field"><label>${customer?'Customer':'Supplier'}</label><select id="payPerson">${list.map(x=>`<option value="${x.id}" ${obj&&x.id===obj.id?'selected':''}>${esc(x.name)} — ${money(customer?x.outstanding:x.payable)}</option>`).join('')}</select></div><div class="field"><label>Amount</label><input id="payAmt" type="number" min="0"></div><div class="field"><label>Mode</label><select id="payMode"><option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option></select></div><div class="field"><label>Notes</label><input id="payNote"></div></div><div class="actions"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="savePayment('${type}')">Save Payment</button></div>`;modal.classList.add('show')}
-function savePayment(type){let customer=type==='in',list=customer?db.customers:db.suppliers,obj=list.find(x=>x.id===payPerson.value),amt=+payAmt.value||0;if(!obj||amt<=0)return alert('Enter valid amount');let outstanding=customer?obj.outstanding:obj.payable;if(amt>outstanding)return alert('Amount cannot exceed outstanding balance');if(customer){obj.outstanding-=amt;obj.received+=amt}else{obj.payable-=amt;obj.paid+=amt}db.payments.push({date:new Date().toLocaleDateString('en-IN'),number:nextNo('payment'),type,person:obj.name,amount:amt,mode:payMode.value,note:payNote.value});save();closeModal()}
+// A payment received/paid later must also clear the unpaid invoices, oldest first — otherwise the bill keeps showing "Due".
+function allocatePayment(list,person,amount){
+  let key=String(person||'').trim().toLowerCase(),left=+amount||0;
+  for(let x of list){if(left<=0)break;if(String(x.person||'').trim().toLowerCase()!==key||!(x.due>0))continue;
+    let take=Math.min(x.due,left);x.paid=(x.paid||0)+take;x.due=Math.round((x.due-take)*100)/100;if(x.due<0.005)x.due=0;x.payment=x.due===0?'Paid':'Partial';left-=take}
+  return left;
+}
+function migratePaymentAllocation(){
+  if(db.settings.payAllocV1)return false;
+  let changed=false;
+  (db.payments||[]).forEach(p=>{let before=JSON.stringify(p.type==='in'?db.sales:db.purchases);allocatePayment(p.type==='in'?db.sales:db.purchases,p.person,p.amount);if(before!==JSON.stringify(p.type==='in'?db.sales:db.purchases))changed=true});
+  db.settings.payAllocV1=true;return changed;
+}
+function savePayment(type){let customer=type==='in',list=customer?db.customers:db.suppliers,obj=list.find(x=>x.id===payPerson.value),amt=+payAmt.value||0;if(!obj||amt<=0)return alert('Enter valid amount');let outstanding=customer?obj.outstanding:obj.payable;if(amt>outstanding)return alert('Amount cannot exceed outstanding balance');if(customer){obj.outstanding-=amt;obj.received+=amt}else{obj.payable-=amt;obj.paid+=amt}db.payments.push({date:new Date().toLocaleDateString('en-IN'),number:nextNo('payment'),type,person:obj.name,amount:amt,mode:payMode.value,note:payNote.value});allocatePayment(customer?db.sales:db.purchases,obj.name,amt);save();closeModal()}
 function openExpense(id){let e=id?db.expenses.find(x=>x.id===id):null;modalContent.innerHTML=`<h2>${id?'Edit':'Add'} Expense</h2><div class="formgrid"><div class="field"><label>Category</label><select id="excat"><option ${e?.category==='Rent'?'selected':''}>Rent</option><option ${e?.category==='Courier'?'selected':''}>Courier</option><option ${e?.category==='Marketing'?'selected':''}>Marketing</option><option ${e?.category==='Packaging'?'selected':''}>Packaging</option><option ${e?.category==='Electricity'?'selected':''}>Electricity</option><option ${e?.category==='Salary'?'selected':''}>Salary</option><option ${e?.category==='Other'?'selected':''}>Other</option></select></div><div class="field"><label>Amount</label><input id="examt" type="number" value="${e?e.amount:''}"></div><div class="field full"><label>Description</label><input id="exdesc" value="${esc(e?.description||'')}"></div><div class="field"><label>Payment</label><select id="expay"><option ${e?.payment==='Paid'?'selected':''}>Paid</option><option ${e?.payment==='Due'?'selected':''}>Due</option></select></div></div><div class="actions"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveExpense('${id||''}')">Save Expense</button></div>`;modal.classList.add('show')}
 function saveExpense(id){let amount=+examt.value||0;if(!amount)return alert('Amount required');if(id){let e=db.expenses.find(x=>x.id===id);if(e){e.category=excat.value;e.description=exdesc.value;e.amount=amount;e.payment=expay.value}}else{db.expenses.push({id:'exp'+Date.now()+Math.random().toString(36).slice(2),date:new Date().toLocaleDateString('en-IN'),category:excat.value,description:exdesc.value,amount,payment:expay.value})}save();closeModal()}
 function deleteExpense(id){if(!confirm('Delete this expense?'))return;db.expenses=db.expenses.filter(x=>x.id!==id);save()}
@@ -1286,6 +1299,7 @@ function applyNewStockOct4(){
   persistLocal();scheduleCloudSync();
 }
 applyNewStockOct4();
+if(!isFreshDb(db)&&migratePaymentAllocation()){persistLocal();scheduleCloudSync()}
 {let before=JSON.stringify(db.sales.map(x=>x.date));normalizeAllDates();if(JSON.stringify(db.sales.map(x=>x.date))!==before)persistLocal()}
 renderAll();
 updateSafetyBanner();
