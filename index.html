@@ -1049,8 +1049,7 @@ td.n{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600}td.n 
 .tot div{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:#ead9bd}
 .tot .g{border-top:1px solid rgba(217,184,120,.5);margin-top:6px;padding-top:11px;font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:600;color:var(--gold2)}
 .tot .due{color:#fff;font-weight:500}
-.stamp{display:inline-block;margin-top:18px;border:3px solid ${st[1]};color:${st[1]};font-family:'Cormorant Garamond',serif;font-weight:600;font-size:26px;letter-spacing:.2em;padding:2px 14px;border-radius:8px;transform:rotate(-8deg);opacity:.85}
-.stampwrap{text-align:right;padding-right:40px}
+.card{position:relative}.card:first-child{padding-right:118px}.stamp{position:absolute;right:16px;top:18px;border:3px solid ${st[1]};color:${st[1]};font-family:'Cormorant Garamond',serif;font-weight:600;font-size:21px;letter-spacing:.18em;padding:1px 12px;border-radius:7px;transform:rotate(-8deg);opacity:.85}
 .loyal{margin-top:22px;border:1px solid var(--gold);border-radius:12px;padding:15px 20px;text-align:center;background:linear-gradient(135deg,#fff,#fbf1dc);break-inside:avoid}
 .lt{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--mar)}.lt b{font-family:Jost,sans-serif;font-size:15px;letter-spacing:.14em;color:#fff;background:var(--mar);padding:3px 11px;border-radius:6px;margin-left:4px;white-space:nowrap}
 .ls{font-size:10.5px;color:var(--mut);letter-spacing:.06em;margin-top:8px}
@@ -1058,11 +1057,15 @@ td.n{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600}td.n 
 .foot .t{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;color:var(--mar)}.foot .s{font-size:10px;letter-spacing:.22em;color:var(--mut);margin-top:6px}
 @media print{body{background:#fff}.inv{margin:0;box-shadow:none}}
 @media screen and (max-width:820px){.inv{width:auto;min-height:100vh;margin:0}.top{padding:24px 18px}.brand{font-size:30px}.body{padding:20px 14px}.meta,.sum{flex-direction:column;align-items:stretch}.tot{width:auto}th,td{padding:9px 5px}.foot{padding:16px 14px}.lt b{display:inline-block;margin-top:6px}}
-</style></head><body><div class="inv">
+.c1 td{padding:8px 10px}.c1 td.n{font-size:15.5px}.c1 .top{padding:28px 46px 24px}.c1 .body{padding-top:22px}.c1 table{margin-top:18px}.c1 .sum{margin-top:16px}.c1 .loyal{margin-top:16px;padding:11px 18px}
+.c2 td{padding:5px 10px;font-size:12px}.c2 td.n{font-size:14px}.c2 td.n small{display:inline;margin-left:6px}.c2 .qr{width:96px;height:96px}.c2 .card{padding:10px 16px}.c2 .card .nm{font-size:19px}
+.c3 td{padding:3px 8px;font-size:11.5px}.c3 td.n{font-size:13px}.c3 .top{padding:20px 40px 18px}.c3 .brand{font-size:34px}.c3 .meta{gap:12px}.c3 .card p{font-size:11px}.c3 .tot div{padding:3px 0}.c3 .tot .g{font-size:21px}.c3 .foot{padding:12px 40px 14px}
+@media print{.inv{min-height:296mm}}
+</style></head><body><div class="inv ${(x.items||[]).length>12?'c1 c2 c3':(x.items||[]).length>6?'c1 c2':(x.items||[]).length>4?'c1':''}">
 <div class="top"><div class="brand">IZYAN<small>ATTAR &amp; PERFUMES</small></div><div class="doc"><b>${s.gst?'TAX INVOICE':'INVOICE'}</b><div>No. ${esc(x.invoice)}</div><div>${esc(x.date)}</div></div></div>
-<div class="body"><div class="meta"><div class="card"><div class="lbl">BILLED TO</div><div class="nm">${esc(x.person)}</div><p>${to||'&nbsp;'}</p></div><div class="card"><div class="lbl">FROM</div><div class="nm">${esc(s.name||'IZYAN Attar & Perfumes')}</div><p>${from||'@izyan.attar'}</p></div></div>
+<div class="body"><div class="meta"><div class="card"><span class="stamp">${st[0]}</span><div class="lbl">BILLED TO</div><div class="nm">${esc(x.person)}</div><p>${to||'&nbsp;'}</p></div><div class="card"><div class="lbl">FROM</div><div class="nm">${esc(s.name||'IZYAN Attar & Perfumes')}</div><p>${from||'@izyan.attar'}</p></div></div>
 <table><thead><tr><th>PRODUCT</th><th>SIZE</th><th class="r">QTY</th><th class="r">RATE</th><th class="r">AMOUNT</th></tr></thead><tbody>${items}</tbody></table>
-<div class="sum">${payBox}<div><div class="tot">${tot}</div><div class="stampwrap"><span class="stamp">${st[0]}</span></div></div></div>
+<div class="sum">${payBox}<div class="tot">${tot}</div></div>
 ${loyal}</div>
 <div class="foot"><div class="t">Thank you for choosing IZYAN — wear your story.</div><div class="s">@IZYAN.ATTAR · FOLLOW US ON INSTAGRAM · DM FOR ORDERS</div></div>
 </div><script>window.onload=function(){var go=function(){window.print()};(document.fonts&&document.fonts.ready?document.fonts.ready.then(function(){setTimeout(go,150)}):setTimeout(go,400))}<\/script></body></html>`);w.document.close()}
