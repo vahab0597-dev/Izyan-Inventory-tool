@@ -1049,7 +1049,7 @@ td.n{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600}td.n 
 .tot div{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:#ead9bd}
 .tot .g{border-top:1px solid rgba(217,184,120,.5);margin-top:6px;padding-top:11px;font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:600;color:var(--gold2)}
 .tot .due{color:#fff;font-weight:500}
-.card{position:relative}.card:first-child{padding-right:118px}.stamp{position:absolute;right:16px;top:18px;border:3px solid ${st[1]};color:${st[1]};font-family:'Cormorant Garamond',serif;font-weight:600;font-size:21px;letter-spacing:.18em;padding:1px 12px;border-radius:7px;transform:rotate(-8deg);opacity:.85}
+.card{position:relative}.card.stamped{padding-right:118px}.stamp{position:absolute;right:16px;top:18px;border:3px solid ${st[1]};color:${st[1]};font-family:'Cormorant Garamond',serif;font-weight:600;font-size:21px;letter-spacing:.18em;padding:1px 12px;border-radius:7px;transform:rotate(-8deg);opacity:.85}
 .loyal{margin-top:22px;border:1px solid var(--gold);border-radius:12px;padding:15px 20px;text-align:center;background:linear-gradient(135deg,#fff,#fbf1dc);break-inside:avoid}
 .lt{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--mar)}.lt b{font-family:Jost,sans-serif;font-size:15px;letter-spacing:.14em;color:#fff;background:var(--mar);padding:3px 11px;border-radius:6px;margin-left:4px;white-space:nowrap}
 .ls{font-size:10.5px;color:var(--mut);letter-spacing:.06em;margin-top:8px}
@@ -1063,7 +1063,7 @@ td.n{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600}td.n 
 @media print{.inv{min-height:0}.body{flex:none}.foot{break-inside:avoid;margin-top:18px}}
 </style></head><body><div class="inv ${(x.items||[]).length>12?'c1 c2 c3':(x.items||[]).length>6?'c1 c2':(x.items||[]).length>4?'c1':''}">
 <div class="top"><div class="brand">IZYAN<small>ATTAR &amp; PERFUMES</small></div><div class="doc"><b>${s.gst?'TAX INVOICE':'INVOICE'}</b><div>No. ${esc(x.invoice)}</div><div>${esc(x.date)}</div></div></div>
-<div class="body"><div class="meta"><div class="card"><span class="stamp">${st[0]}</span><div class="lbl">BILLED TO</div><div class="nm">${esc(x.person)}</div><p>${to||'&nbsp;'}</p></div><div class="card"><div class="lbl">FROM</div><div class="nm">${esc(s.name||'IZYAN Attar & Perfumes')}</div><p>${from||'@izyan.attar'}</p></div></div>
+<div class="body"><div class="meta"><div class="card${st[0]==='PAID'?' stamped':''}">${st[0]==='PAID'?'<span class="stamp">PAID</span>':''}<div class="lbl">BILLED TO</div><div class="nm">${esc(x.person)}</div><p>${to||'&nbsp;'}</p></div><div class="card"><div class="lbl">FROM</div><div class="nm">${esc(s.name||'IZYAN Attar & Perfumes')}</div><p>${from||'@izyan.attar'}</p></div></div>
 <table><thead><tr><th>PRODUCT</th><th>SIZE</th><th class="r">QTY</th><th class="r">RATE</th><th class="r">AMOUNT</th></tr></thead><tbody>${items}</tbody></table>
 <div class="sum">${payBox}<div class="tot">${tot}</div></div>
 ${loyal}</div>
