@@ -1023,7 +1023,7 @@ let st=invoiceStamp(x),c=invoiceLoyalty(x);
 let loyal=c?`<div class="loyal"><div class="lt">Thank you — here’s your ${esc(c.pct||LOYALTY_PCT)}% loyalty code: <b>${esc(c.code)}</b></div><div class="ls">Valid till ${esc(c.validTill)} · one-time use · share this code on WhatsApp with your next order</div></div>`:'';
 let from=[s.address,s.mobile,s.email,s.gst?'GSTIN: '+s.gst:''].filter(Boolean).map(esc).join('<br>');
 let to=[x.mobile,x.address].filter(Boolean).map(esc).join('<br>');
-w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(x.invoice)} · ${esc(x.person)}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet"><style>
+w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="format-detection" content="telephone=no,email=no,address=no"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(x.invoice)} · ${esc(x.person)}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet"><style>
 :root{--mar:#5b1220;--mar2:#7a1c2e;--gold:#b8924d;--gold2:#d9b878;--ivory:#fbf6ec;--ink:#241a17;--mut:#7d6f64}
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:A4;margin:0}
 body{margin:0;background:#e9e3d8;font-family:Jost,Arial,sans-serif;color:var(--ink)}
@@ -1060,7 +1060,7 @@ td.n{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600}td.n 
 .c1 td{padding:8px 10px}.c1 td.n{font-size:15.5px}.c1 .top{padding:28px 46px 24px}.c1 .body{padding-top:22px}.c1 table{margin-top:18px}.c1 .sum{margin-top:16px}.c1 .loyal{margin-top:16px;padding:11px 18px}
 .c2 td{padding:5px 10px;font-size:12px}.c2 td.n{font-size:14px}.c2 td.n small{display:inline;margin-left:6px}.c2 .qr{width:96px;height:96px}.c2 .card{padding:10px 16px}.c2 .card .nm{font-size:19px}
 .c3 td{padding:3px 8px;font-size:11.5px}.c3 td.n{font-size:13px}.c3 .top{padding:20px 40px 18px}.c3 .brand{font-size:34px}.c3 .meta{gap:12px}.c3 .card p{font-size:11px}.c3 .tot div{padding:3px 0}.c3 .tot .g{font-size:21px}.c3 .foot{padding:12px 40px 14px}
-@media print{.inv{min-height:296mm}}
+@media print{.inv{min-height:0}.body{flex:none}.foot{break-inside:avoid;margin-top:18px}}
 </style></head><body><div class="inv ${(x.items||[]).length>12?'c1 c2 c3':(x.items||[]).length>6?'c1 c2':(x.items||[]).length>4?'c1':''}">
 <div class="top"><div class="brand">IZYAN<small>ATTAR &amp; PERFUMES</small></div><div class="doc"><b>${s.gst?'TAX INVOICE':'INVOICE'}</b><div>No. ${esc(x.invoice)}</div><div>${esc(x.date)}</div></div></div>
 <div class="body"><div class="meta"><div class="card"><span class="stamp">${st[0]}</span><div class="lbl">BILLED TO</div><div class="nm">${esc(x.person)}</div><p>${to||'&nbsp;'}</p></div><div class="card"><div class="lbl">FROM</div><div class="nm">${esc(s.name||'IZYAN Attar & Perfumes')}</div><p>${from||'@izyan.attar'}</p></div></div>
