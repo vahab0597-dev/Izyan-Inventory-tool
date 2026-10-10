@@ -166,6 +166,76 @@
 .nav button{justify-content:flex-start!important;width:100%!important;color:#1f2937!important;font-size:14px!important;padding:11px 12px!important;text-align:left!important}
 .nav button.active,.nav button:hover{background:#eff6ff!important;color:#1d4ed8!important}
 @media(max-width:850px){.nav{right:8px;left:8px;width:auto}.brand{flex:1 1 auto;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:15px!important;padding:4px 2px!important}.brand small{display:none}.curPage{max-width:36vw;padding:8px 10px;font-size:12px}.topRight{gap:6px;flex:none}}
+/* ===== Quick Bill (POS) ===== */
+.pos{position:fixed;inset:0;z-index:25;background:#eef2f7;display:none;flex-direction:column}
+.pos.open{display:flex}
+.posHead{display:flex;align-items:center;gap:10px;background:var(--nav);color:#fff;padding:10px 14px;flex-wrap:wrap}
+.posHead h2{margin:0;font-size:17px;white-space:nowrap}.posHead h2 small{display:block;font-size:10px;color:#94a3b8;font-weight:500;letter-spacing:.04em}
+.posCust{display:flex;gap:8px;flex:1;min-width:260px}.posCust input{flex:1;min-width:0;padding:9px 11px;border-radius:9px;border:1px solid #334155;background:#1f2937;color:#fff}
+.posCust input::placeholder{color:#94a3b8}
+.posHeadBtns{display:flex;gap:8px}.posHeadBtns button{padding:9px 12px;border-radius:9px;border:1px solid #334155;background:#1f2937;color:#e2e8f0;cursor:pointer;white-space:nowrap}
+.posBody{flex:1;display:grid;grid-template-columns:1fr 400px;min-height:0}
+.posLeft{display:flex;flex-direction:column;min-height:0;padding:12px 12px 0}
+.posSearch{display:flex;gap:8px;margin-bottom:10px}.posSearch input{flex:1;padding:12px 14px;border-radius:11px;border:1px solid #cbd5e1;background:#fff;font-size:15px}
+.posTabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto}.posTabs button{padding:8px 14px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;color:#334155;cursor:pointer;white-space:nowrap;font-size:13px}
+.posTabs button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.posGrid{flex:1;overflow:auto;display:grid;grid-auto-rows:max-content;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;align-content:start;padding-bottom:90px}
+.posTile{position:relative;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;cursor:pointer;text-align:left;padding:0;display:flex;flex-direction:column;box-shadow:0 2px 8px #1720330a;transition:transform .12s,box-shadow .12s}
+.posTile:hover{transform:translateY(-2px);box-shadow:0 6px 16px #17203318}.posTile:active{transform:scale(.98)}
+.posPic{position:relative;flex:none;height:96px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:26px;color:#fff;letter-spacing:.02em}
+.posPic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.posTile b{display:block;font-size:13px;padding:7px 9px 0;line-height:1.25;color:#0f172a}
+.posTile small{display:flex;justify-content:space-between;gap:4px;padding:3px 9px 8px;font-size:11.5px;color:#64748b}
+.posTile small em{font-style:normal;color:var(--blue);font-weight:700}
+.posTile .posLow{color:var(--red);font-weight:700}
+.posTile .posCat{position:absolute;top:6px;left:6px;background:#0f172acc;color:#fff;font-size:9.5px;padding:2px 7px;border-radius:6px;letter-spacing:.05em}
+.posRight{background:#fff;border-left:1px solid #e2e8f0;display:flex;flex-direction:column;min-height:0}
+.posBillHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #e2e8f0}.posBillHead b{font-size:15px}
+.posBillHead button{border:0;background:none;color:var(--red);cursor:pointer;font-size:12.5px}
+.posLines{flex:1;overflow:auto;padding:4px 10px}
+.posLine{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:9px 4px;border-bottom:1px dashed #e2e8f0}
+.posLine .n{font-size:13.5px;font-weight:600;color:#0f172a}.posLine .s{font-size:11.5px;color:#64748b;margin-top:2px}
+.posQty{display:flex;align-items:center;border:1px solid #cbd5e1;border-radius:9px;overflow:hidden}
+.posQty button{width:30px;height:30px;border:0;background:#f1f5f9;cursor:pointer;font-size:16px}.posQty span{min-width:28px;text-align:center;font-weight:700;font-size:13.5px}
+.posAmt{min-width:70px;text-align:right;font-weight:700;font-size:13.5px}.posAmt button{display:block;margin:2px 0 0 auto;border:0;background:none;color:#94a3b8;cursor:pointer;font-size:12px}
+.posEmpty{padding:40px 16px;text-align:center;color:#94a3b8;font-size:13.5px}
+.posFoot{border-top:1px solid #e2e8f0;padding:10px 14px 12px;background:#f8fafc}
+.posRow{display:flex;gap:8px;align-items:center;margin-bottom:8px}.posRow label{font-size:11px;color:#64748b;width:62px;flex:none}
+.posRow input{flex:1;min-width:0;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff}
+.posRow button.sm{padding:8px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;white-space:nowrap}
+.posMsg{font-size:11.5px;margin:-4px 0 8px 70px}
+.posPay{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0 8px}
+.posPay button{padding:9px 4px;border-radius:9px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-size:12.5px;font-weight:600;color:#334155}
+.posPay button.on{background:#0f172a;border-color:#0f172a;color:#fff}
+.posTot{display:flex;justify-content:space-between;font-size:12.5px;color:#475569;padding:2px 0}
+.posGrand{display:flex;justify-content:space-between;align-items:baseline;margin:6px 0 10px;padding-top:8px;border-top:1px solid #e2e8f0}
+.posGrand span{font-size:13px;color:#475569;font-weight:600}.posGrand b{font-size:28px;color:#0f172a}
+.posWarn{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:9px;padding:8px 10px;font-size:12px;margin-bottom:8px}
+.posSave{width:100%;padding:15px;border:0;border-radius:12px;background:var(--green);color:#fff;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.02em}
+.posSave:disabled{background:#94a3b8;cursor:not-allowed}
+.posSave small{display:block;font-size:10.5px;font-weight:500;opacity:.8;margin-top:2px}
+.posPick{position:fixed;inset:0;z-index:26;background:#0f172a80;display:none;align-items:center;justify-content:center;padding:16px}
+.posPick.open{display:flex}
+.posPickBox{background:#fff;border-radius:16px;width:min(420px,100%);padding:18px;box-shadow:0 20px 60px #0005}
+.posPickBox h3{margin:0 0 2px;font-size:18px}.posPickBox .sub{margin-bottom:12px}
+.posPickT{display:flex;gap:6px;margin-bottom:10px}.posPickT button{flex:1;padding:9px;border-radius:9px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-weight:700}
+.posPickT button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.posPickS{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:8px;margin-bottom:12px}
+.posPickS button{padding:12px 6px;border-radius:11px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;line-height:1.35}
+.posPickS button b{display:block;font-size:14px}.posPickS button span{font-size:12.5px;color:var(--blue);font-weight:700}
+.posPickS button.on{border-color:var(--blue);background:#eff6ff;box-shadow:0 0 0 2px #2563eb33}
+.posPickS button:disabled{opacity:.45;cursor:not-allowed}
+.posPickQ{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.posPickQ label{display:flex;align-items:center;gap:6px;font-size:13px}
+.posPickAdd{width:100%;padding:13px;border:0;border-radius:11px;background:var(--blue);color:#fff;font-size:15px;font-weight:800;cursor:pointer}
+.posPickErr{color:var(--red);font-size:12.5px;min-height:16px;margin-bottom:6px}
+.posMobBar{display:none}
+@media(max-width:900px){
+ .posBody{grid-template-columns:1fr}.posRight{position:fixed;left:0;right:0;bottom:0;top:auto;max-height:86vh;border-radius:18px 18px 0 0;box-shadow:0 -12px 40px #0003;transform:translateY(100%);transition:transform .25s ease;z-index:2;border-left:0}
+ .posRight.up{transform:none}
+ .posMobBar{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:1;align-items:center;justify-content:space-between;background:#0f172a;color:#fff;border:0;border-radius:14px;padding:14px 16px;font-size:15px;font-weight:700;box-shadow:0 10px 30px #0004;cursor:pointer}
+ .posHead{padding:8px 10px}.posCust{order:3;flex-basis:100%}.posGrid{grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px}.posPic{height:78px;font-size:22px}
+}
 </style>
 </head>
 <body>
@@ -176,7 +246,7 @@
 <nav class="nav" id="mainMenu">
 <button class="active" onclick="show('dashboard',this)">🏠 Dashboard</button>
 <button onclick="show('products',this)">📦 Products</button>
-<button onclick="show('sales',this)">🧾 Sales / Billing</button>
+<button onclick="openPOS()">⚡ Quick Bill</button><button onclick="show('sales',this)">🧾 Sales / Billing</button>
 <button id="navOrders" onclick="show('orders',this)">🛒 Online Orders <span id="navOrdersCount" class="navCount" style="display:none"></span></button>
 <button id="navOrderBook" onclick="show('orderbook',this)">📒 Order Book <span id="navBookCount" class="navCount" style="display:none;background:#b7791f"></span></button>
 <button onclick="show('purchases',this)">🚚 Purchases</button>
@@ -194,13 +264,13 @@
 <section id="dashboard" class="section active">
 <div class="top"><div><h1>Dashboard</h1><p>IZYAN Attar & Perfumes — daily business control</p></div><button class="btn" onclick="openSale()">+ New Sale</button></div>
 <div class="cards"><div class="card"><div class="label">Today's Sales</div><div class="value" id="dTodaySales">₹0</div><div class="sub" id="dTodayCount">0 invoices</div></div><div class="card"><div class="label">Stock Value</div><div class="value" id="dStock">₹0</div><div class="sub">At purchase cost</div></div><div class="card"><div class="label">Profit — This Month</div><div class="value" id="dProfit">₹0</div><div class="sub">After product cost & expenses</div></div><div class="card"><div class="label">Receivables</div><div class="value" id="dReceivable">₹0</div><div class="sub">Customer outstanding</div></div></div>
-<div class="grid2"><div class="panel"><h2>Quick Actions</h2><div class="quick"><button onclick="openSale()"><b>💰 New Sale</b><span>Multi-item invoice</span></button><button onclick="openPurchase()"><b>📦 New Purchase</b><span>Increase stock</span></button><button onclick="openPhotoStockIn()"><b>📸 Add Stock with Photo</b><span>View photo while entering</span></button><button onclick="openPayment('in')"><b>💵 Receive Payment</b><span>Customer outstanding</span></button><button onclick="openPayment('out')"><b>💳 Pay Supplier</b><span>Supplier outstanding</span></button><button onclick="openExpense()"><b>🧾 Add Expense</b><span>Track business cost</span></button><button onclick="show('reports')"><b>📊 Reports</b><span>See performance</span></button></div></div><div class="panel"><h2>Stock Alerts</h2><div id="dashLow"></div></div></div>
+<div class="grid2"><div class="panel"><h2>Quick Actions</h2><div class="quick"><button onclick="openPOS()"><b>⚡ Quick Bill</b><span>POS-style fast billing</span></button><button onclick="openSale()"><b>💰 New Sale</b><span>Multi-item invoice</span></button><button onclick="openPurchase()"><b>📦 New Purchase</b><span>Increase stock</span></button><button onclick="openPhotoStockIn()"><b>📸 Add Stock with Photo</b><span>View photo while entering</span></button><button onclick="openPayment('in')"><b>💵 Receive Payment</b><span>Customer outstanding</span></button><button onclick="openPayment('out')"><b>💳 Pay Supplier</b><span>Supplier outstanding</span></button><button onclick="openExpense()"><b>🧾 Add Expense</b><span>Track business cost</span></button><button onclick="show('reports')"><b>📊 Reports</b><span>See performance</span></button></div></div><div class="panel"><h2>Stock Alerts</h2><div id="dashLow"></div></div></div>
 <div class="panel" style="margin-top:15px"><h2>Recent Sales</h2><div class="tablewrap"><table class="table"><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th></tr></thead><tbody id="dashSales"></tbody></table></div></div>
 </section>
 
 <section id="products" class="section"><div class="top"><div><h1>Products / Inventory</h1><p>6ML • 12ML • 50ML • 100ML • Smart perfume recipe consumption</p></div><button class="btn" onclick="openProduct()">+ Add Product</button></div><div class="toolbar"><input id="productSearch" class="search" placeholder="Search product, SKU, category..." oninput="renderProducts()"><select id="catFilter" onchange="renderProducts()"><option value="">All Categories</option><option>Attar</option><option>Gift Set</option><option>Raw Material</option></select><button class="btn light" onclick="exportProducts()">Export CSV</button></div><div class="panel"><div class="tablewrap"><table class="table"><thead><tr><th>SKU</th><th>Product</th><th>Category</th><th>Prices</th><th>Stock</th><th>Status</th><th></th></tr></thead><tbody id="productRows"></tbody></table></div></div></section>
 
-<section id="sales" class="section"><div class="top"><div><h1>Sales / Billing</h1><p>Invoices, payments, returns and customer ledger</p></div><button class="btn" onclick="openSale()">+ New Sale</button></div><div class="toolbar"><input id="saleSearch" class="search" placeholder="Search invoice, customer, mobile..." oninput="renderSales()"></div><div class="panel"><div class="tablewrap"><table class="table"><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Paid</th><th>Due</th><th></th></tr></thead><tbody id="saleRows"></tbody></table></div></div></section>
+<section id="sales" class="section"><div class="top"><div><h1>Sales / Billing</h1><p>Invoices, payments, returns and customer ledger</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" style="background:var(--green)" onclick="openPOS()">⚡ Quick Bill</button><button class="btn" onclick="openSale()">+ New Sale</button></div></div><div class="toolbar"><input id="saleSearch" class="search" placeholder="Search invoice, customer, mobile..." oninput="renderSales()"></div><div class="panel"><div class="tablewrap"><table class="table"><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Paid</th><th>Due</th><th></th></tr></thead><tbody id="saleRows"></tbody></table></div></div></section>
 
 <section id="purchases" class="section"><div class="top"><div><h1>Purchases</h1><p>Stock-in, supplier bills and payables</p></div><button class="btn" onclick="openPurchase()">+ New Purchase</button></div><div class="panel"><div class="tablewrap"><table class="table"><thead><tr><th>Bill</th><th>Date</th><th>Supplier</th><th>Items</th><th>Total</th><th>Paid</th><th>Due</th><th>Actions</th></tr></thead><tbody id="purchaseRows"></tbody></table></div></div></section>
 
@@ -297,6 +367,43 @@
 
 </main>
 
+<div class="pos" id="pos" role="dialog" aria-label="Quick Bill">
+  <div class="posHead">
+    <h2>⚡ Quick Bill<small>POS · F2 search · F9 save</small></h2>
+    <div class="posCust"><input id="posName" list="posCustList" placeholder="Customer name (Walk-in)" autocomplete="off" oninput="posCustPicked()"><input id="posMobile" inputmode="tel" placeholder="Mobile"><datalist id="posCustList"></datalist></div>
+    <div class="posHeadBtns"><button type="button" onclick="posClassic()" title="Open the full New Sale form (manual items, raw material, address)">Full form</button><button type="button" onclick="closePOS()">✕ Close</button></div>
+  </div>
+  <div class="posBody">
+    <div class="posLeft">
+      <div class="posSearch"><input id="posQ" placeholder="Search product… (F2)" oninput="posState.q=this.value;posRenderGrid()" autocomplete="off"></div>
+      <div class="posTabs" id="posTabs"></div>
+      <div class="posGrid" id="posGrid"></div>
+    </div>
+    <div class="posRight" id="posRight">
+      <div class="posBillHead"><b id="posCount">Bill</b><button type="button" onclick="posClear()">Clear all</button></div>
+      <div class="posLines" id="posLines"></div>
+      <div class="posFoot">
+        <div class="posRow"><label>Loyalty</label><input id="posCode" placeholder="IZY-XXXX" style="text-transform:uppercase"><button type="button" class="sm" onclick="posApplyCode()">Apply</button></div>
+        <div class="posMsg" id="posCodeMsg"></div>
+        <div class="posRow"><label>Discount ₹</label><input id="posDisc" type="number" min="0" value="0" oninput="posState.coupon=null;posCodeMsg.textContent='';posRenderTotals()"><label style="width:auto">GST %</label><input id="posGst" type="number" min="0" value="0" style="max-width:70px" oninput="posRenderTotals()"></div>
+        <div class="posPay" id="posPay"></div>
+        <div class="posRow"><label>Paid ₹</label><input id="posPaid" type="number" min="0" value="0" oninput="posState.paidEdited=true;posRenderTotals()"></div>
+        <div id="posTotals"></div>
+        <div id="posWarn"></div>
+        <button type="button" class="posSave" id="posSaveBtn" onclick="posSave()">Save &amp; Print<small>F9</small></button>
+      </div>
+    </div>
+    <button type="button" class="posMobBar" id="posMobBar" onclick="posRight.classList.toggle('up')"><span id="posMobTxt">🧾 0 items</span><span id="posMobAmt">₹0 ▲</span></button>
+  </div>
+</div>
+<div class="posPick" id="posPick" onclick="if(event.target===this)posPickClose()"><div class="posPickBox">
+  <h3 id="posPickName"></h3><div class="sub" id="posPickStock"></div>
+  <div class="posPickT" id="posPickT"></div>
+  <div class="posPickS" id="posPickS"></div>
+  <div class="posPickQ"><div class="posQty"><button type="button" onclick="posPickQty(-1)">−</button><span id="posPickQ">1</span><button type="button" onclick="posPickQty(1)">+</button></div><label><input type="checkbox" id="posPickFree" style="width:auto;margin:0"> 🎁 Free gift</label></div>
+  <div class="posPickErr" id="posPickErr"></div>
+  <button type="button" class="posPickAdd" onclick="posPickAdd()">Add to Bill</button>
+</div></div>
 <div class="modal" id="modal"><div class="modalbox" id="modalContent"></div></div>
 
 <script>
@@ -1362,5 +1469,131 @@ if(!isFreshDb(db)&&migratePaymentAllocation()){persistLocal();scheduleCloudSync(
 renderAll();
 updateSafetyBanner();
 setInterval(updateSafetyBanner,600000);
+</script>
+<script>
+/* ===== Quick Bill (POS) — builds the same bill items as the New Sale form and saves through saveBill() ===== */
+const POS_IMG_BASE='https://vahab0597-dev.github.io/Izyan-Attar-Perfume/images/';
+const POS_PAY=[['Cash','Cash'],['UPI','UPI'],['Card','Card'],['Credit','Credit / Due']];
+let posState={items:[],coupon:null,tab:'all',q:'',mode:'Cash',paidEdited:false,pick:null};
+function posSlug(n){return String(n||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
+function posColor(n){let h=0;String(n).split('').forEach(c=>{h=(h*31+c.charCodeAt(0))%360});return `linear-gradient(135deg,hsl(${h},45%,38%),hsl(${(h+40)%360},50%,24%))`}
+function posSellable(p){return p&&!isRaw(p)&&(isAttar(p)||isPerfume(p))}
+function posTypes(p){return isAttar(p)?['Attar','Perfume']:['Perfume']}
+function posSizes(type){return type==='Attar'?ATTAR_SIZES:PERFUME_SIZES}
+function posUnitCost(p,type,size){if(isAttar(p)){if(type==='Attar')return (p.purchase||0)*sizeMl({size});let{attarG,alcG}=perfumeSplit(1,size),alc=findProductByName('Alcohol');return (p.purchase||0)*attarG+(alc?.purchase||0)*alcG}return p.purchase||0}
+function openPOS(){
+  let m=document.getElementById('pos');if(!m)return;
+  posCustList.innerHTML=db.customers.map(c=>`<option value="${esc(c.name)}">`).join('');
+  posRenderTabs();posRenderGrid();posRenderPay();posRenderBill();
+  let sb=document.getElementById('safetyBanner');m.style.top=(sb&&sb.offsetHeight&&getComputedStyle(sb).display!=='none')?sb.offsetHeight+'px':'0';
+  m.classList.add('open');document.body.style.overflow='hidden';
+  setTimeout(()=>posQ.focus(),50);
+}
+function closePOS(force){
+  if(!force&&posState.items.length&&!confirm('Close Quick Bill? Items in this bill will be cleared.'))return;
+  posReset();document.getElementById('pos').classList.remove('open');document.body.style.overflow='';
+}
+function posReset(){posState={items:[],coupon:null,tab:'all',q:'',mode:'Cash',paidEdited:false,pick:null};['posName','posMobile','posQ','posCode'].forEach(id=>document.getElementById(id).value='');posDisc.value=0;posGst.value=0;posPaid.value=0;posCodeMsg.textContent='';posRight.classList.remove('up')}
+function posCustPicked(){let c=findPerson(db.customers,posName.value);if(c&&c.mobile&&!posMobile.value)posMobile.value=c.mobile}
+function posRenderTabs(){
+  let tabs=[['all','All'],['attar','Attar'],['perfume','Perfume'],['low','Low stock']];
+  posTabs.innerHTML=tabs.map(t=>`<button type="button" class="${posState.tab===t[0]?'on':''}" onclick="posState.tab='${t[0]}';posRenderTabs();posRenderGrid()">${t[1]}</button>`).join('');
+}
+function posRenderGrid(){
+  let q=posState.q.trim().toLowerCase();
+  let list=db.products.filter(posSellable).filter(p=>{
+    if(posState.tab==='attar'&&!isAttar(p))return false;
+    if(posState.tab==='perfume'&&!isPerfume(p))return false;
+    if(posState.tab==='low'&&!(isLow(p)&&!hasRecipe(p)))return false;
+    return !q||p.name.toLowerCase().includes(q);
+  }).sort((a,b)=>a.name.localeCompare(b.name));
+  posGrid.innerHTML=list.map(p=>{
+    let i=db.products.indexOf(p),ini=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    let price=isAttar(p)?priceForItem(p,'Attar','12ML'):priceForItem(p,'Perfume','50ML'),low=isLow(p)&&!hasRecipe(p);
+    let stock=isAttar(p)?Math.round(internalStock(p))+'g':(hasRecipe(p)?'recipe':internalStock(p)+' pcs');
+    return `<button type="button" class="posTile" onclick="posPickOpen(${i})"><div class="posPic" style="background:${posColor(p.name)}">${esc(ini)}<img src="${POS_IMG_BASE}${posSlug(p.name)}.jpg" alt="" loading="lazy" onerror="this.remove()"><span class="posCat">${isAttar(p)?'ATTAR':'PERFUME'}</span></div><b>${esc(p.name)}</b><small><em>${price?money(price):'—'}</em><span class="${low?'posLow':''}">${esc(stock)}</span></small></button>`;
+  }).join('')||'<div class="posEmpty" style="grid-column:1/-1">No product found</div>';
+}
+function posPickOpen(i){
+  let p=db.products[i];if(!p)return;
+  let last=posState.lastPick&&posState.lastPick.cat===isAttar(p)?posState.lastPick:null;
+  let type=last?last.type:posTypes(p)[0];if(!posTypes(p).includes(type))type=posTypes(p)[0];
+  posState.pick={i,type,size:type==='Attar'?'12ML':'50ML',qty:1};
+  posPickFree.checked=false;posPickErr.textContent='';
+  posPickName.textContent=p.name;posPickStock.textContent='In stock: '+stockLabel(p);
+  posPickRender();posPick.classList.add('open');
+}
+function posPickClose(){posPick.classList.remove('open');posState.pick=null}
+function posPickRender(){
+  let k=posState.pick,p=db.products[k.i];
+  posPickT.innerHTML=posTypes(p).map(t=>`<button type="button" class="${k.type===t?'on':''}" onclick="posState.pick.type='${t}';posState.pick.size='${t==='Attar'?'12ML':'50ML'}';posPickRender()">${t}</button>`).join('');
+  posPickS.innerHTML=posSizes(k.type).map(s=>{let pr=priceForItem(p,k.type,s);return `<button type="button" class="${k.size===s?'on':''}" onclick="posState.pick.size='${s}';posPickRender()"><b>${s.replace('ML',' ml')}</b><span>${pr?money(pr):'FREE'}</span></button>`}).join('');
+  document.getElementById('posPickQ').textContent=k.qty;
+}
+function posPickQty(d){let k=posState.pick;k.qty=Math.max(1,k.qty+d);document.getElementById('posPickQ').textContent=k.qty}
+function posPickAdd(){
+  let k=posState.pick,p=k&&db.products[k.i];if(!p)return;
+  let rate=priceForItem(p,k.type,k.size),free=posPickFree.checked||!rate;
+  let item={productId:p.id,name:p.name,type:k.type,size:k.size,qty:k.qty,rate:free?0:rate,cost:0,manual:false,free};
+  let trial=posState.items.map(x=>({...x}));
+  let ex=trial.find(x=>x.productId===item.productId&&x.type===item.type&&x.size===item.size&&!!x.free===!!item.free&&x.rate===item.rate);
+  if(ex)ex.qty+=item.qty;else trial.push(item);
+  let short=billStockShortage(trial);if(short){posPickErr.textContent=short;return}
+  posState.items=trial;posState.lastPick={cat:isAttar(p),type:k.type};
+  posPickClose();posRenderBill();
+}
+function posLineQty(n,d){let x=posState.items[n];if(!x)return;let trial=posState.items.map(y=>({...y}));trial[n].qty+=d;if(trial[n].qty<=0)trial.splice(n,1);if(d>0){let short=billStockShortage(trial);if(short)return alert(short)}posState.items=trial;posRenderBill()}
+function posClear(){if(posState.items.length&&!confirm('Remove all items from this bill?'))return;posState.items=[];posState.coupon=null;posDisc.value=0;posCodeMsg.textContent='';posRenderBill()}
+function posBase(){return posState.items.reduce((s,x)=>s+x.rate*x.qty,0)}
+function posApplyCode(){let r=couponLookup(posCode.value);if(r.err){posState.coupon=null;posCodeMsg.textContent='✗ '+r.err;posCodeMsg.style.color='#c0392b';return}let base=posBase();if(!base){posCodeMsg.textContent='Add items first, then apply the code';posCodeMsg.style.color='#c0392b';return}posState.coupon=r.c;posDisc.value=Math.round(base*r.c.pct/100);posCodeMsg.textContent=`✓ ${r.c.code} — ${r.c.pct}% off (₹${posDisc.value})${r.c.customer?' · issued to '+r.c.customer:''}`;posCodeMsg.style.color='#15803d';posRenderTotals()}
+function posRenderPay(){posPay.innerHTML=POS_PAY.map(m=>`<button type="button" class="${posState.mode===m[0]?'on':''}" onclick="posState.mode='${m[0]}';posState.paidEdited=false;posRenderPay();posRenderTotals()">${m[0]==='Credit'?'Credit':m[0]}</button>`).join('')}
+function posCalc(){let base=posBase(),disc=Math.min(Math.max(+posDisc.value||0,0),base),taxable=base-disc,gst=Math.max(0,+posGst.value||0),tax=taxable*gst/100,total=taxable+tax;return{base,disc,gst,tax,total}}
+function posRenderTotals(){
+  let t=posCalc();
+  if(!posState.paidEdited)posPaid.value=posState.mode==='Credit'?0:Math.round(t.total*100)/100;
+  let paid=Math.min(Math.max(+posPaid.value||0,0),t.total),n=posState.items.reduce((s,x)=>s+x.qty,0);
+  posTotals.innerHTML=`<div class="posTot"><span>Subtotal</span><span>${money(t.base)}</span></div>`+
+    (t.disc?`<div class="posTot"><span>Discount${posState.coupon?' ('+esc(posState.coupon.code)+')':''}</span><span>− ${money(t.disc)}</span></div>`:'')+
+    (t.tax?`<div class="posTot"><span>GST ${t.gst}%</span><span>${money(t.tax)}</span></div>`:'')+
+    `<div class="posTot"><span>Balance due</span><span>${money(t.total-paid)}</span></div><div class="posGrand"><span>TOTAL</span><b>${money(t.total)}</b></div>`;
+  posMobTxt.textContent=`🧾 ${n} item${n===1?'':'s'}`;posMobAmt.textContent=money(t.total)+' ▲';
+  posSaveBtn.disabled=!posState.items.length;
+}
+function posRenderBill(){
+  let n=posState.items.reduce((s,x)=>s+x.qty,0);
+  posCount.textContent=n?`Bill · ${n} item${n===1?'':'s'}`:'Bill';
+  posLines.innerHTML=posState.items.map((x,i)=>`<div class="posLine"><div><div class="n">${esc(x.name)}${x.free?' 🎁':''}</div><div class="s">${esc(x.type)} · ${esc(String(x.size).replace('ML',' ml'))} · ${x.free?'FREE':money(x.rate)}</div></div><div class="posQty"><button type="button" onclick="posLineQty(${i},-1)">−</button><span>${x.qty}</span><button type="button" onclick="posLineQty(${i},1)">+</button></div><div class="posAmt">${x.free?'FREE':money(x.rate*x.qty)}<button type="button" onclick="posLineQty(${i},-${x.qty})" title="Remove">✕ remove</button></div></div>`).join('')||'<div class="posEmpty">Tap a product to add it to the bill</div>';
+  let short=posState.items.length?billStockShortage(posState.items):'';
+  posWarn.innerHTML=short?`<div class="posWarn">⚠️ ${esc(short)}</div>`:'';
+  posRenderTotals();
+}
+function posSave(){
+  if(!posState.items.length)return alert('Add at least one product');
+  let t=posCalc(),paid=Math.min(Math.max(+posPaid.value||0,0),t.total),name=posName.value.trim(),mobile=posMobile.value.trim(),c=findPerson(db.customers,name);
+  let items=posState.items.map(x=>({...x,cost:posUnitCost(db.products.find(p=>p.id===x.productId),x.type,x.size)*x.qty}));
+  let before=db.sales.length,coupon=posState.coupon;
+  openSale();
+  bperson.value=name;bmobile.value=mobile;baddress.value=c?.address||'';
+  window.billItems=items;window.billCoupon=coupon;
+  bdisc.value=t.disc;bgst.value=t.gst;bpaid.value=paid;
+  bpay.value=posState.mode==='Credit'?'Credit / Due':(paid<t.total&&paid>0?'Partial':posState.mode);
+  if(coupon)bcode.value=coupon.code;
+  renderBillItems('sale');
+  saveBill('sale');
+  if(db.sales.length>before){closePOS(true)}
+}
+function posClassic(){
+  let items=posState.items.map(x=>({...x,cost:posUnitCost(db.products.find(p=>p.id===x.productId),x.type,x.size)*x.qty})),name=posName.value.trim(),mobile=posMobile.value.trim(),coupon=posState.coupon,disc=posCalc().disc;
+  closePOS(true);openSale();
+  bperson.value=name;bmobile.value=mobile;let c=findPerson(db.customers,name);baddress.value=c?.address||'';
+  window.billItems=items;window.billCoupon=coupon;bdisc.value=disc;if(coupon)bcode.value=coupon.code;renderBillItems('sale');
+}
+document.addEventListener('keydown',function(e){
+  let m=document.getElementById('pos');if(!m||!m.classList.contains('open'))return;
+  if(e.key==='F2'){e.preventDefault();posQ.focus();posQ.select()}
+  else if(e.key==='F9'){e.preventDefault();if(!posPick.classList.contains('open'))posSave()}
+  else if(e.key==='Escape'){if(posPick.classList.contains('open'))posPickClose();else if(document.getElementById('modal').classList.contains('show'))return;else closePOS()}
+  else if(e.key==='Enter'&&posPick.classList.contains('open')&&e.target.tagName!=='BUTTON'){e.preventDefault();posPickAdd()}
+});
 </script>
 </body></html>
