@@ -236,6 +236,25 @@
  .posMobBar{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:1;align-items:center;justify-content:space-between;background:#0f172a;color:#fff;border:0;border-radius:14px;padding:14px 16px;font-size:15px;font-weight:700;box-shadow:0 10px 30px #0004;cursor:pointer}
  .posHead{padding:8px 10px}.posCust{order:3;flex-basis:100%}.posGrid{grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px}.posPic{height:78px;font-size:22px}
 }
+.gw{margin-bottom:14px}.gw-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.gw-head h2{margin:0}
+.gw-pct{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}.gw-pct input{width:58px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;font:inherit;color:#172033;text-align:right}
+.gw-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 10px}.gw-stat{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.gw-stat .l{font-size:11.5px;color:var(--muted)}.gw-stat .v{font-size:19px;font-weight:700;margin-top:3px;color:#172033;font-variant-numeric:tabular-nums}.gw-stat .s{font-size:11.5px;color:var(--muted);margin-top:2px}
+.gw-bar{height:10px;background:#e5e7eb;border-radius:6px;overflow:hidden;position:relative}.gw-bar i{display:block;height:100%;border-radius:6px;background:var(--blue);transition:width .4s}
+.gw-note{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;margin-top:8px;color:#334155}.gw-note b{font-variant-numeric:tabular-nums}
+.gw-tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:20px}.gw-tag.ok{background:#ecfdf5;color:#047857}.gw-tag.bad{background:#fef2f2;color:#b91c1c}
+.gw-y{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}.gw-y h3{margin:0 0 8px;font-size:14px}
+.gw-grid{display:grid;grid-template-columns:repeat(12,minmax(52px,1fr));gap:6px;overflow-x:auto;padding-bottom:4px}
+.gw-m{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border-radius:8px;padding:4px 2px;border:1px solid transparent}
+.gw-m:hover,.gw-m.sel{background:#f1f5f9;border-color:var(--line)}
+.gw-m .amt{font-size:10.5px;color:#334155;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gw-m .col{height:84px;width:22px;display:flex;align-items:flex-end;position:relative}
+.gw-m .col i{display:block;width:100%;background:#93c5fd;border-radius:4px 4px 0 0;min-height:2px}
+.gw-m.cur .col i{background:var(--blue)}.gw-m.zero .col i{background:#e5e7eb}
+.gw-m .col u{position:absolute;left:-4px;right:-4px;bottom:0;border:2px dashed var(--amber);border-bottom:0;border-radius:5px 5px 0 0;pointer-events:none}
+.gw-m .mo{font-size:11px;color:var(--muted)}.gw-m.cur .mo{color:#172033;font-weight:700}
+.gw-info{font-size:12.5px;color:#334155;margin-top:6px;min-height:18px}
+@media(max-width:760px){.gw-stats{grid-template-columns:1fr 1fr}.gw-stat .v{font-size:17px}.gw-grid{grid-template-columns:repeat(12,46px)}}
 </style>
 </head>
 <body>
@@ -285,6 +304,11 @@
 <section id="reports" class="section"><div class="top"><div><h1>Reports</h1><p>Sales • purchases • stock • profit • receivables • payables</p></div><button class="btn light" onclick="recalcOldBills()" title="Use after fixing purchase prices">↻ Recalculate old bills' profit</button></div>
 <div class="panel" style="margin-bottom:14px;padding:12px"><div class="formgrid"><div class="field"><label>Period</label><select id="rpPeriod" onchange="rpCustomBox.style.display=this.value==='custom'?'contents':'none';renderReports()"><option value="month">This Month</option><option value="today">Today</option><option value="lastmonth">Last Month</option><option value="all">All Time</option><option value="custom">Custom Dates</option></select></div><div id="rpCustomBox" style="display:none"><div class="field"><label>From</label><input id="rpFrom" type="date" onchange="renderReports()"></div><div class="field"><label>To</label><input id="rpTo" type="date" onchange="renderReports()"></div></div></div><div class="sub" id="rpLabel" style="margin-top:6px"></div></div>
 <div class="cards"><div class="card"><div class="label">Sales</div><div class="value" id="rSales">₹0</div><div class="sub" id="rCount"></div></div><div class="card"><div class="label">Total Purchases</div><div class="value" id="rPurchase">₹0</div></div><div class="card"><div class="label">Gross Profit</div><div class="value" id="rGross">₹0</div></div><div class="card"><div class="label">Expenses</div><div class="value" id="rExpense">₹0</div></div></div>
+<div class="panel gw" id="gwPanel"><div class="gw-head"><div><h2>Growth Target — <span id="gwMonthName"></span></h2><div class="sub">Always this month vs last month (not affected by the period filter above)</div></div><label class="gw-pct">Growth goal <input id="gwPct" type="number" min="0" max="500" step="1" onchange="gwSetPct(this.value)"> %</label></div>
+<div class="gw-stats"><div class="gw-stat"><div class="l">Last month sales</div><div class="v" id="gwLast">₹0</div><div class="s" id="gwLastName"></div></div><div class="gw-stat"><div class="l">This month so far</div><div class="v" id="gwNow">₹0</div><div class="s" id="gwNowCount"></div></div><div class="gw-stat"><div class="l">Target this month</div><div class="v" id="gwTarget">₹0</div><div class="s" id="gwTargetSub"></div></div><div class="gw-stat"><div class="l">Still needed</div><div class="v" id="gwNeed">₹0</div><div class="s" id="gwPerDay"></div></div></div>
+<div class="gw-bar" title="Progress to target"><i id="gwFill" style="width:0"></i></div>
+<div class="gw-note"><span id="gwProg"></span><span id="gwVsLast"></span><span id="gwPace"></span></div>
+<div class="gw-y"><h3>Last 12 months — sales</h3><div class="gw-grid" id="gwGrid"></div><div class="gw-info" id="gwInfo">Tap a month to see details. Dashed box = this month's target.</div></div></div>
 <div class="grid2"><div class="panel"><h2>Profit & Loss</h2><table class="table"><tbody><tr><td>Sales</td><td id="rpSales">₹0</td></tr><tr><td>Cost of Goods Sold</td><td id="rpCogs">₹0</td></tr><tr><td>Gross Profit</td><td id="rpGross">₹0</td></tr><tr><td>Expenses</td><td id="rpExp">₹0</td></tr><tr><td><b>Estimated Net Profit</b></td><td><b id="rpNet">₹0</b></td></tr></tbody></table><h2 style="margin-top:16px">Top Selling</h2><table class="table"><thead><tr><th>Product</th><th>Qty</th><th>Amount</th></tr></thead><tbody id="rpTop"></tbody></table></div><div class="panel"><h2>Outstanding</h2><table class="table"><tbody><tr><td>Customer Receivable</td><td id="rpRec">₹0</td></tr><tr><td>Supplier Payable</td><td id="rpPay">₹0</td></tr><tr><td>Stock Value</td><td id="rpStock">₹0</td></tr></tbody></table></div></div>
 </section>
 
@@ -612,7 +636,7 @@ function renderAll(){let t=totals(),today=new Date().toLocaleDateString('en-IN')
 function costCell(p){if(!(isAttar(p)||isRaw(p)))return money(p.purchase);let pg=Number(p.purchase)||0;let base=p.purchaseAmt!=null&&p.purchaseQty?`${money(p.purchaseAmt)} / ${p.purchaseQty}g<br>`:'';let warn=costLooksWrong(p)?' <span class="badge low" title="Cost per gram looks too high — edit and enter amount + grams">CHECK</span>':(pg===0&&isAttar(p)?' <span class="badge warn">No cost</span>':'');return `${base}₹${pg.toFixed(2)}/g${warn}`}
 function costLooksWrong(p){let pg=Number(p.purchase)||0;if(!pg)return false;if(isAttar(p)){let sell=(Number(p.attar12)||0)/12;return sell>0&&pg>sell}if(isRaw(p))return pg>=10;return false}
 function recalcOldBills(){if(!confirm('Recalculate product cost & profit for ALL old sale bills using the CURRENT purchase prices?\n\nStock and bill amounts do not change — only cost/profit figures.'))return;recomputeAllSaleCosts();save();alert('Done — cost & profit recalculated for '+db.sales.length+' bills.')}
-function renderReports(){if(typeof rSales==='undefined')return;let key=document.getElementById('rpPeriod')?.value||'month',r=periodRange(key),t=totals(key==='all'?null:r);let fmt=d=>d?d.toLocaleDateString('en-IN'):'…';rpLabel.textContent=key==='all'?'Showing: all time':`Showing: ${fmt(r[0])} to ${fmt(r[1])}`;rSales.textContent=money(t.sales);rCount.textContent=t.count+' invoices';secretSet(rPurchase,money(t.purchases));secretSet(rGross,money(t.gross));rExpense.textContent=money(t.exp);rpSales.textContent=money(t.sales-t.tax);secretSet(rpCogs,money(t.cogs));secretSet(rpGross,money(t.gross));rpExp.textContent=money(t.exp);secretSet(rpNet,money(t.net));let agg={};t.salesList.forEach(s=>(s.items||[]).forEach(i=>{if(i.free)return;let k=i.name+' · '+(i.type==='Perfume'?'Perfume ':'')+(i.size||'');agg[k]=agg[k]||{q:0,a:0};agg[k].q+=i.qty;agg[k].a+=i.rate*i.qty}));let top=Object.entries(agg).sort((a,b)=>b[1].a-a[1].a).slice(0,8);rpTop.innerHTML=top.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v.q}</td><td>${money(v.a)}</td></tr>`).join('')||'<tr><td colspan="3" class="empty">No sales in this period</td></tr>'}
+function renderReports(){if(typeof rSales==='undefined')return;if(typeof renderGrowth==='function')try{renderGrowth()}catch(e){console.error(e)};let key=document.getElementById('rpPeriod')?.value||'month',r=periodRange(key),t=totals(key==='all'?null:r);let fmt=d=>d?d.toLocaleDateString('en-IN'):'…';rpLabel.textContent=key==='all'?'Showing: all time':`Showing: ${fmt(r[0])} to ${fmt(r[1])}`;rSales.textContent=money(t.sales);rCount.textContent=t.count+' invoices';secretSet(rPurchase,money(t.purchases));secretSet(rGross,money(t.gross));rExpense.textContent=money(t.exp);rpSales.textContent=money(t.sales-t.tax);secretSet(rpCogs,money(t.cogs));secretSet(rpGross,money(t.gross));rpExp.textContent=money(t.exp);secretSet(rpNet,money(t.net));let agg={};t.salesList.forEach(s=>(s.items||[]).forEach(i=>{if(i.free)return;let k=i.name+' · '+(i.type==='Perfume'?'Perfume ':'')+(i.size||'');agg[k]=agg[k]||{q:0,a:0};agg[k].q+=i.qty;agg[k].a+=i.rate*i.qty}));let top=Object.entries(agg).sort((a,b)=>b[1].a-a[1].a).slice(0,8);rpTop.innerHTML=top.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v.q}</td><td>${money(v.a)}</td></tr>`).join('')||'<tr><td colspan="3" class="empty">No sales in this period</td></tr>'}
 function priceSummary(p){if(p.category==='Attar')return `6ml ${money(p.attar6)} · 12ml ${money(p.attar12)}<br>50ml ${money(p.perfume50)} · 100ml ${money(p.perfume100)}`;return money(p.selling)}
 function renderProducts(){let q=(productSearch?.value||'').toLowerCase(),cat=catFilter?.value||'';let a=db.products.filter(p=>(p.name+' '+p.sku+' '+p.category).toLowerCase().includes(q)&&(!cat||p.category===cat));productRows.innerHTML=a.map(p=>`<tr><td>${esc(p.sku)}</td><td><b>${esc(p.name)}</b></td><td>${esc(p.category)}</td><td style="font-size:12px">${priceSummary(p)}</td><td><b>${esc(stockLabel(p))}</b></td><td><span class="badge ${isLow(p)?'low':''}">${isLow(p)?'LOW':'OK'}</span></td><td><button class="btn light" onclick="openProduct('${p.id}')">Edit</button> <button class="btn light" style="color:#c0392b" onclick="deleteProduct('${p.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">No products</td></tr>'}
 function deleteProduct(id){
@@ -1599,5 +1623,31 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='Escape'){if(posPick.classList.contains('open'))posPickClose();else if(document.getElementById('modal').classList.contains('show'))return;else closePOS()}
   else if(e.key==='Enter'&&posPick.classList.contains('open')&&e.target.tagName!=='BUTTON'){e.preventDefault();posPickAdd()}
 });
+</script>
+<script>
+// ---- Growth target + 12-month sales view (Reports) ----
+function gwMonthSales(y,m){let S=db.sales.filter(x=>{let d=parseBizDate(x.date);return d&&d.getFullYear()===y&&d.getMonth()===m});return{amt:S.reduce((s,x)=>s+(x.total||0),0),n:S.length}}
+function gwShort(n){n=Math.round(n||0);if(n>=100000)return '₹'+(n/100000).toFixed(n>=1000000?0:1).replace(/\.0$/,'')+'L';if(n>=1000)return '₹'+(n/1000).toFixed(n>=10000?0:1).replace(/\.0$/,'')+'k';return '₹'+n}
+function gwSetPct(v){v=Math.max(0,Math.min(500,Number(v)||0));db.settings.growthPct=v;save();renderGrowth()}
+function renderGrowth(){if(typeof gwGrid==='undefined')return;
+ let MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],now=new Date(),y=now.getFullYear(),m=now.getMonth(),day=now.getDate(),dim=new Date(y,m+1,0).getDate();
+ let ly=m?y:y-1,lm=m?m-1:11,pct=db.settings.growthPct==null?10:Number(db.settings.growthPct);gwPct.value=pct;
+ let cur=gwMonthSales(y,m),last=gwMonthSales(ly,lm),target=Math.round(last.amt*(1+pct/100));
+ gwMonthName.textContent=MN[m]+' '+y;gwLast.textContent=money(last.amt);gwLastName.textContent=MN[lm]+' '+ly+' · '+last.n+' invoices';
+ gwNow.textContent=money(cur.amt);gwNowCount.textContent=cur.n+' invoices · day '+day+' of '+dim;
+ if(last.amt>0){gwTarget.textContent=money(target);gwTargetSub.textContent='last month + '+pct+'%'}else{gwTarget.textContent='—';gwTargetSub.textContent='no sales last month'}
+ let need=Math.max(0,target-cur.amt),left=dim-day+1;
+ gwNeed.textContent=last.amt>0?money(need):'—';gwPerDay.textContent=last.amt>0?(need>0?money(Math.ceil(need/left))+'/day for '+left+' day'+(left>1?'s':''):'Target reached 🎉'):'';
+ let p=target>0?Math.min(100,cur.amt/target*100):0;gwFill.style.width=p.toFixed(1)+'%';gwFill.style.background=p>=100?'var(--green)':'var(--blue)';
+ gwProg.innerHTML=last.amt>0?'<b>'+Math.floor(cur.amt/target*100)+'%</b> of target':'';
+ let gap=last.amt-cur.amt;gwVsLast.innerHTML=gap>0?'<span class="gw-tag bad">▼ Short by '+money(Math.round(gap))+'</span> vs last month total':'<span class="gw-tag ok">▲ Ahead by '+money(Math.round(-gap))+'</span> vs last month total';
+ let sameDay=db.sales.filter(x=>{let d=parseBizDate(x.date);return d&&d.getFullYear()===ly&&d.getMonth()===lm&&d.getDate()<=day}).reduce((s,x)=>s+(x.total||0),0),pg=cur.amt-sameDay;
+ gwPace.innerHTML='Same date last month: <b>'+money(Math.round(sameDay))+'</b> ('+(pg>=0?'+':'−')+money(Math.round(Math.abs(pg)))+')';
+ let months=[];for(let k=11;k>=0;k--){let d=new Date(y,m-k,1),v=gwMonthSales(d.getFullYear(),d.getMonth());months.push({y:d.getFullYear(),m:d.getMonth(),amt:v.amt,n:v.n,cur:k===0})}
+ let max=Math.max(1,target,...months.map(x=>x.amt));
+ gwGrid.innerHTML=months.map((x,i)=>{let h=Math.round(x.amt/max*84),tl=x.cur&&last.amt>0?'<u style="height:'+Math.round(target/max*84)+'px"></u>':'';return '<div class="gw-m'+(x.cur?' cur':'')+(x.amt?'':' zero')+'" data-i="'+i+'" onclick="gwPick('+i+')" title="'+MN[x.m]+' '+x.y+': '+money(x.amt)+' · '+x.n+' invoices"><div class="amt">'+(x.amt?gwShort(x.amt):'–')+'</div><div class="col"><i style="height:'+h+'px"></i>'+tl+'</div><div class="mo">'+MN[x.m]+(x.m===0||i===0?" '"+String(x.y).slice(2):'')+'</div></div>'}).join('');
+ gwGrid._m=months;gwGrid.scrollLeft=gwGrid.scrollWidth;let tot=months.reduce((s,x)=>s+x.amt,0);gwInfo.textContent='12-month total: '+money(tot)+' · Tap a month for details. Dashed box = this month\'s target.'}
+function gwPick(i){let x=gwGrid._m[i],MN=['January','February','March','April','May','June','July','August','September','October','November','December'];document.querySelectorAll('.gw-m').forEach(e=>e.classList.toggle('sel',e.dataset.i==i));let prev=gwGrid._m[i-1],ch=prev&&prev.amt?((x.amt-prev.amt)/prev.amt*100):null;gwInfo.innerHTML='<b>'+MN[x.m]+' '+x.y+'</b>: '+money(x.amt)+' · '+x.n+' invoices'+(x.n?' · avg bill '+money(Math.round(x.amt/x.n)):'')+(ch!=null?' · '+(ch>=0?'▲ +':'▼ ')+ch.toFixed(0)+'% vs '+MN[prev.m]:'')}
+try{if(typeof db!=='undefined')renderGrowth()}catch(e){console.error(e)}
 </script>
 </body></html>
