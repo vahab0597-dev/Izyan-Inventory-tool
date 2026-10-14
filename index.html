@@ -263,6 +263,7 @@
 .gw-m .mo{font-size:11px;color:var(--muted)}.gw-m.cur .mo{color:#172033;font-weight:700}
 .gw-info{font-size:12.5px;color:#334155;margin-top:6px;min-height:18px}
 @media(max-width:760px){.gw-stats{grid-template-columns:1fr 1fr}.gw-stat .v{font-size:17px}.gw-grid{grid-template-columns:repeat(12,46px)}}
+.obWeb{display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 7px;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;margin-top:4px}
 </style>
 </head>
 <body>
@@ -322,7 +323,7 @@
 
 <section id="orderbook" class="section"><div class="top"><div><h1>Order Book</h1><p>Orders you take by phone, WhatsApp or in person — write now, bill later</p></div><button class="btn" onclick="openBookOrder()">+ New Order</button></div>
 <div class="cards obCards"><div class="card"><div class="label">Pending Orders</div><div class="value" id="obPendCount">0</div><div class="sub" id="obPendValue">₹0 to bill</div></div><div class="card"><div class="label">Today's Orders</div><div class="value" id="obTodayCount">0</div><div class="sub">written today</div></div><div class="card"><div class="label">This Month</div><div class="value" id="obMonth">0</div><div class="sub" id="obMonthValue">₹0</div></div><div class="card"><div class="label">Billed This Month</div><div class="value" id="obBilled">0</div><div class="sub">converted to invoice</div></div></div>
-<div class="toolbar" style="margin-top:14px"><input id="obSearch" class="search" placeholder="Search customer, mobile, product, AWB…" oninput="renderOrderBook()"><select id="obStatus" class="search" style="max-width:190px" onchange="renderOrderBook()"><option value="Pending">Pending (to bill)</option><option value="Billed">Billed</option><option value="Cancelled">Cancelled</option><option value="all">All orders</option></select><select id="obPeriod" class="search" style="max-width:170px" onchange="renderOrderBook()"><option value="all">All dates</option><option value="today">Today</option><option value="week">Last 7 days</option><option value="month">This month</option><option value="lastmonth">Last month</option></select></div>
+<div class="toolbar" style="margin-top:14px"><input id="obSearch" class="search" placeholder="Search customer, mobile, product, AWB…" oninput="renderOrderBook()"><select id="obSrc" class="search" style="max-width:170px" onchange="renderOrderBook()"><option value="all">All</option><option value="web">🌐 Website</option><option value="manual">✍️ Manual</option></select><select id="obStatus" class="search" style="max-width:190px" onchange="renderOrderBook()"><option value="Pending">Pending (to bill)</option><option value="Billed">Billed</option><option value="Cancelled">Cancelled</option><option value="all">All orders</option></select><select id="obPeriod" class="search" style="max-width:170px" onchange="renderOrderBook()"><option value="all">All dates</option><option value="today">Today</option><option value="week">Last 7 days</option><option value="month">This month</option><option value="lastmonth">Last month</option></select></div>
 <div class="notice">Writing an order here does <b>not</b> change stock. Stock reduces only when you press <b>Create Bill</b> and save the invoice.</div>
 <div class="panel"><div class="tablewrap"><table class="table obTable"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody id="obRows"></tbody></table></div></div></section>
 <section id="orders" class="section"><div class="top"><div><h1>Online Orders</h1><p>Orders placed on the IZYAN website (“Order on WhatsApp”)</p></div><button class="btn" onclick="fetchOnlineOrders()">⟳ Refresh</button></div>
@@ -1347,21 +1348,31 @@ function obSellable(){return db.products.map((p,i)=>({p,i})).filter(x=>!isRaw(x.
 function obPeriodRange(k){if(k==='all')return null;if(k==='week'){let n=new Date(),t=new Date(n.getFullYear(),n.getMonth(),n.getDate());return[new Date(t.getFullYear(),t.getMonth(),t.getDate()-6),t]}return periodRange(k)}
 function obItemHtml(x){let tag=x.type==='Attar'?'a':x.type==='Perfume'?'p':'';return `<span class="obItem">${esc(x.name)}${tag?`<span class="obTag ${tag}">${esc(x.type)}</span>`:''} <small>${esc(x.size||'')} × ${x.qty}${x.rate?' · '+money(x.rate*x.qty):''}</small></span>`}
 function obStatusBadge(s){return `<span class="badge ${s==='Billed'?'paid':s==='Cancelled'?'due':'warn'}">${esc(s==='Pending'?'Pending':s)}</span>`}
+// ---- Order Book also lists website (online) orders — read live from the order sheet, never copied ----
+function obWebOrders(){if(typeof ordersConfigured!=='function'||!ordersConfigured())return[];return (window.onlineOrders||[]).map(w=>{let d=new Date(w.receivedAt),ok=!isNaN(d);return{src:'web',id:w.orderId,no:w.orderId,customer:w.name||'',mobile:w.phone||'',address:w.address||'',date:ok?d.toLocaleDateString('en-IN'):obToday(),created:ok?d.getTime():0,status:w.status==='Confirmed'?'Billed':w.status==='Cancelled'?'Cancelled':'Pending',items:(w.items||[]).map(i=>({name:i.name,size:i.size,qty:i.qty,rate:i.price})),total:Number(w.total)||0,invoice:w.invoice||'',w}})}
+function obAmt(o){return o.src==='web'?o.total:obTotal(o)}
+function obWebRow(o){let w=o.w,id=esc(o.id),sale=db.sales.find(x=>x.onlineOrderId===o.id);
+ let items=(o.items||[]).map(obItemHtml).join('')+giftLines(w).map(g=>`<span class="obNote">🎁 ${esc(g)}</span>`).join('');
+ let acts=o.status==='Pending'?`<button class="btn" onclick="createBillFromOrder('${id}')">Create Bill</button><button class="btn light" onclick="chatOrderCustomer('${id}')">💬 Chat</button><button class="btn light" style="color:#c0392b" onclick="cancelOnlineOrder('${id}')">Cancel</button>`:
+  o.status==='Cancelled'?`<button class="btn light" onclick="reopenOnlineOrder('${id}')">Reopen</button>`:
+  (sale?`<span class="sub">${esc(sale.invoice)}</span><br><button class="btn light" onclick="sendBillWhatsApp('${sale.id}')">💬 Send Bill</button><button class="btn light" onclick="printInvoice('${sale.id}')">Print</button>`:`<span class="sub">${esc(o.invoice)}</span><br><button class="btn light" onclick="chatOrderCustomer('${id}')">💬 Chat</button>`);
+ return `<tr><td><b>${id}</b><br><span class="obWeb">🌐 Website</span><div class="sub">${orderTime(w)}</div></td><td><b>${esc(o.customer)}</b>${o.mobile?`<br><span class="sub">${esc(o.mobile)}</span>`:''}${o.address?`<span class="obNote">📍 ${esc(o.address)}</span>`:''}</td><td>${items}</td><td><b>${money(o.total)}</b>${w.discount?`<div class="sub">${esc(w.discountCode||'Discount')} −${money(w.discount)}</div>`:''}</td><td>${obStatusBadge(o.status)}</td><td class="obActs">${acts}</td></tr>`}
 function renderOrderBook(){
   let rows=document.getElementById('obRows');if(!rows)return;
-  let all=db.orderBook||[],today=obToday(),mr=periodRange('month');
+  let all=(db.orderBook||[]).concat(obWebOrders()),today=obToday(),mr=periodRange('month');
   let pend=all.filter(o=>o.status==='Pending');
-  obPendCount.textContent=pend.length;obPendValue.textContent=money(pend.reduce((s,o)=>s+obTotal(o),0))+' to bill';
+  obPendCount.textContent=pend.length;obPendValue.textContent=money(pend.reduce((s,o)=>s+obAmt(o),0))+' to bill';
   obTodayCount.textContent=all.filter(o=>o.date===today&&o.status!=='Cancelled').length;
-  let mo=all.filter(o=>inRange(o.date,mr)&&o.status!=='Cancelled');obMonth.textContent=mo.length;obMonthValue.textContent=money(mo.reduce((s,o)=>s+obTotal(o),0));
+  let mo=all.filter(o=>inRange(o.date,mr)&&o.status!=='Cancelled');obMonth.textContent=mo.length;obMonthValue.textContent=money(mo.reduce((s,o)=>s+obAmt(o),0));
   obBilled.textContent=mo.filter(o=>o.status==='Billed').length;
   let nb=document.getElementById('navBookCount');if(nb){nb.textContent=pend.length;nb.style.display=pend.length?'inline-block':'none'}
-  let st=obStatus.value,q=(obSearch.value||'').trim().toLowerCase(),r=obPeriodRange(obPeriod.value);
-  let list=all.filter(o=>(st==='all'||o.status===st)&&(!r||inRange(o.date,r))&&(!q||(o.customer+' '+(o.mobile||'')+' '+o.no+' '+(o.note||'')+' '+(o.awb||'')+' '+(o.courier||'')+' '+(o.items||[]).map(x=>x.name+' '+x.type).join(' ')).toLowerCase().includes(q)));
+  let st=obStatus.value,src=(document.getElementById('obSrc')||{}).value||'all',q=(obSearch.value||'').trim().toLowerCase(),r=obPeriodRange(obPeriod.value);
+  let list=all.filter(o=>(src==='all'||(src==='web')===(o.src==='web'))&&(st==='all'||o.status===st)&&(!r||inRange(o.date,r))&&(!q||(o.customer+' '+(o.mobile||'')+' '+o.no+' '+(o.note||'')+' '+(o.awb||'')+' '+(o.courier||'')+' '+(o.address||'')+' '+(o.items||[]).map(x=>x.name+' '+(x.type||'')).join(' ')).toLowerCase().includes(q)));
   list.sort((a,b)=>(parseBizDate(b.date)-parseBizDate(a.date))||((b.created||0)-(a.created||0)));
   let html='',last='';
   list.forEach(o=>{
     if(o.date!==last){last=o.date;let d=parseBizDate(o.date),cnt=list.filter(x=>x.date===o.date).length;html+=`<tr class="obDate"><td colspan="6">${d?d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):esc(o.date)}${o.date===today?' · Today':''} — ${cnt} order${cnt>1?'s':''}</td></tr>`}
+    if(o.src==='web'){html+=obWebRow(o);return}
     let wa=o.status==='Cancelled'?'':`<button class="btn light obWa" onclick="obSendReceived('${o.id}')" title="WhatsApp: order received">💬 Received${o.msgReceived?' ✓':''}</button><button class="btn light obWa" onclick="openDispatch('${o.id}')" title="Add courier / AWB and send WhatsApp">🚚 Dispatch${o.msgDispatched?' ✓':''}</button>`;
     let acts=o.status==='Pending'?`<button class="btn" onclick="billBookOrder('${o.id}')">Create Bill</button><button class="btn light" onclick="openBookOrder('${o.id}')">Edit</button><button class="btn light" style="color:#c0392b" onclick="setBookStatus('${o.id}','Cancelled')">Cancel</button><br>${wa}`:
       o.status==='Cancelled'?`<button class="btn light" onclick="setBookStatus('${o.id}','Pending')">Reopen</button><button class="btn light" style="color:#c0392b" onclick="deleteBookOrder('${o.id}')">Delete</button>`:
@@ -1669,5 +1680,8 @@ try{if(typeof db!=='undefined')renderGrowth()}catch(e){console.error(e)}
 <script>
 // Offline support + "install as app" (PWA). Fails silently when opened as a local file.
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW',e))})}
+</script>
+<script>
+(function(){if(typeof renderOnlineOrders!=='function')return;const base=renderOnlineOrders;renderOnlineOrders=function(){base.apply(this,arguments);try{renderOrderBook()}catch(e){console.error(e)}};try{renderOrderBook()}catch(e){}})();
 </script>
 </body></html>
