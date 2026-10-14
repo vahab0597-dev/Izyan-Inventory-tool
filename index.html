@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="IZYAN">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>IZYAN Business Manager — Smart Inventory & Billing</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -1649,5 +1657,9 @@ function renderGrowth(){if(typeof gwGrid==='undefined')return;
  gwGrid._m=months;gwGrid.scrollLeft=gwGrid.scrollWidth;let tot=months.reduce((s,x)=>s+x.amt,0);gwInfo.textContent='12-month total: '+money(tot)+' · Tap a month for details. Dashed box = this month\'s target.'}
 function gwPick(i){let x=gwGrid._m[i],MN=['January','February','March','April','May','June','July','August','September','October','November','December'];document.querySelectorAll('.gw-m').forEach(e=>e.classList.toggle('sel',e.dataset.i==i));let prev=gwGrid._m[i-1],ch=prev&&prev.amt?((x.amt-prev.amt)/prev.amt*100):null;gwInfo.innerHTML='<b>'+MN[x.m]+' '+x.y+'</b>: '+money(x.amt)+' · '+x.n+' invoices'+(x.n?' · avg bill '+money(Math.round(x.amt/x.n)):'')+(ch!=null?' · '+(ch>=0?'▲ +':'▼ ')+ch.toFixed(0)+'% vs '+MN[prev.m]:'')}
 try{if(typeof db!=='undefined')renderGrowth()}catch(e){console.error(e)}
+</script>
+<script>
+// Offline support + "install as app" (PWA). Fails silently when opened as a local file.
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW',e))})}
 </script>
 </body></html>
