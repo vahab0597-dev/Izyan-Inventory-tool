@@ -2,8 +2,8 @@
 // The app page is fetched fresh from the network whenever there is internet (so updates arrive
 // automatically) and served from this cache only when offline. Only this site's own files are
 // cached; Google Sheet sync, fonts and website photos are never touched by this worker.
-const CACHE = 'izyan-bm-v2';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './vendor/html2canvas-1.4.1.min.js', './vendor/qrcode-1.0.0.js'];
+const CACHE = 'izyan-bm-v3';
+const CORE = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './vendor/html2canvas-1.4.1.min.js', './vendor/qrcode-1.0.0.js', './vendor/jspdf-2.5.1.umd.min.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
 });
