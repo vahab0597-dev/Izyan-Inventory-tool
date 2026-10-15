@@ -298,7 +298,7 @@
 
 <section id="products" class="section"><div class="top"><div><h1>Products / Inventory</h1><p>6ML • 12ML • 50ML • 100ML • Smart perfume recipe consumption</p></div><button class="btn" onclick="openProduct()">+ Add Product</button></div><div class="toolbar"><input id="productSearch" class="search" placeholder="Search product, SKU, category..." oninput="renderProducts()"><select id="catFilter" onchange="renderProducts()"><option value="">All Categories</option><option>Attar</option><option>Gift Set</option><option>Raw Material</option></select><button class="btn light" onclick="exportProducts()">Export CSV</button></div><div class="panel"><div class="tablewrap"><table class="table"><thead><tr><th>SKU</th><th>Product</th><th>Category</th><th>Prices</th><th>Stock</th><th>Status</th><th></th></tr></thead><tbody id="productRows"></tbody></table></div></div></section>
 
-<section id="sales" class="section"><div class="top"><div><h1>Sales / Billing</h1><p>Invoices, payments, returns and customer ledger</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" style="background:var(--green)" onclick="openPOS()">⚡ Quick Bill</button><button class="btn" onclick="openSale()">+ New Sale</button></div></div><div class="toolbar"><input id="saleSearch" class="search" placeholder="Search invoice, customer, mobile..." oninput="renderSales()"></div><div class="panel"><div class="tablewrap"><table class="table"><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Paid</th><th>Due</th><th></th></tr></thead><tbody id="saleRows"></tbody></table></div></div></section>
+<section id="sales" class="section"><div class="top"><div><h1>Sales / Billing</h1><p>Invoices, payments, returns and customer ledger</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" style="background:var(--green)" onclick="openPOS()">⚡ Quick Bill</button><button class="btn" onclick="openSale()">+ New Sale</button><button class="btn light" onclick="openMergeBills()">🧾 Merge Bills</button></div></div><div class="toolbar"><input id="saleSearch" class="search" placeholder="Search invoice, customer, mobile..." oninput="renderSales()"></div><div class="panel"><div class="tablewrap"><table class="table"><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Paid</th><th>Due</th><th></th></tr></thead><tbody id="saleRows"></tbody></table></div></div><div class="panel" id="fbPanel" style="margin-top:14px;display:none"><h2>🧾 Final Bills (merged)</h2><p class="sub" style="margin:-4px 0 10px">One bill for a customer's unpaid invoices. The original invoices stay in Sales, so stock and monthly reports are not affected.</p><div class="tablewrap"><table class="table"><thead><tr><th>Final Bill</th><th>Date</th><th>Customer</th><th>Bills</th><th>Total</th><th>Balance Due</th><th></th></tr></thead><tbody id="fbRows"></tbody></table></div></div></section>
 
 <section id="purchases" class="section"><div class="top"><div><h1>Purchases</h1><p>Stock-in, supplier bills and payables</p></div><button class="btn" onclick="openPurchase()">+ New Purchase</button></div><div class="panel"><div class="tablewrap"><table class="table"><thead><tr><th>Bill</th><th>Date</th><th>Supplier</th><th>Items</th><th>Total</th><th>Paid</th><th>Due</th><th>Actions</th></tr></thead><tbody id="purchaseRows"></tbody></table></div></div></section>
 
@@ -495,7 +495,7 @@ function scheduleCloudSync(){if(!db.settings.cloudUrl)return;clearTimeout(cloudS
 // so they travel as JSON text inside extra rows of the Settings sheet (split so no cell passes Google's 50,000-char limit).
 const EXT_CHUNK=40000,EXT_MAX_PARTS=10;
 function cloudPayload(){
-  let json=JSON.stringify({coupons:db.coupons||[],campaigns:db.campaigns||[],optOut:db.optOut||[],mkContacts:db.mkContacts||[],orderBook:db.orderBook||[]}),ext={},n=Math.ceil(json.length/EXT_CHUNK)||1;
+  let json=JSON.stringify({coupons:db.coupons||[],campaigns:db.campaigns||[],optOut:db.optOut||[],mkContacts:db.mkContacts||[],orderBook:db.orderBook||[],finalBills:db.finalBills||[]}),ext={},n=Math.ceil(json.length/EXT_CHUNK)||1;
   for(let i=0;i<EXT_MAX_PARTS;i++)ext['extData_'+i]=i<n?'~'+json.slice(i*EXT_CHUNK,(i+1)*EXT_CHUNK):'';
   ext.extDataParts=n;
   return Object.assign({},db,{settings:Object.assign({},db.settings,ext)});
@@ -514,6 +514,7 @@ function mergeCloudExtras(cs){
     (ext.optOut||[]).forEach(o=>{if(!db.optOut.some(x=>key(x.mobile)===key(o.mobile)))db.optOut.push(o)});
     (ext.mkContacts||[]).forEach(o=>{if(!db.mkContacts.some(x=>key(x.mobile)===key(o.mobile)))db.mkContacts.push(o)});
     db.orderBook=db.orderBook||[];(ext.orderBook||[]).forEach(o=>{let i=db.orderBook.findIndex(x=>x.id===o.id);if(i<0)db.orderBook.push(o);else if((o.updated||0)>(db.orderBook[i].updated||0))db.orderBook[i]=o});
+    db.finalBills=db.finalBills||[];(ext.finalBills||[]).forEach(o=>{if(o.deleted){db.finalBills=db.finalBills.filter(x=>x.id!==o.id);return}if(!db.finalBills.some(x=>x.id===o.id))db.finalBills.push(o)});
   }
   Object.keys(db.settings).forEach(k=>{if(/^extData(_\d+|Parts)$/.test(k))delete db.settings[k]});
 }
@@ -657,7 +658,7 @@ function deleteProduct(id){
   db.products=db.products.filter(x=>x.id!==id);
   save();
 }
-function renderSales(){let q=(saleSearch?.value||'').toLowerCase();let a=db.sales.filter(x=>(x.invoice+' '+x.person+' '+x.mobile).toLowerCase().includes(q));saleRows.innerHTML=a.slice().reverse().map(x=>`<tr><td>${esc(x.invoice)}</td><td>${esc(x.date)}</td><td>${esc(x.person)}</td><td>${x.items.length}</td><td>${money(x.total)}</td><td>${money(x.paid)}</td><td>${money(x.due)}</td><td><button class="btn light" onclick="printInvoice('${x.id}')">Print</button> <button class="btn light" onclick="sendBillWhatsApp('${x.id}')">💬 Send Bill</button> <button class="btn light" onclick="tySendThankYou('${x.id}')">💌 Thank You</button> <button class="btn light" style="color:#c0392b" onclick="deleteSale('${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="8" class="empty">No sales</td></tr>'}
+function renderSales(){let q=(saleSearch?.value||'').toLowerCase();let a=db.sales.filter(x=>(x.invoice+' '+x.person+' '+x.mobile).toLowerCase().includes(q));saleRows.innerHTML=a.slice().reverse().map(x=>`<tr><td>${esc(x.invoice)}${x.edits&&x.edits.length?'<div class="sub" title="This bill was edited after saving">✏️ edited</div>':''}</td><td>${esc(x.date)}</td><td>${esc(x.person)}</td><td>${x.items.length}</td><td>${money(x.total)}</td><td>${money(x.paid)}</td><td>${money(x.due)}</td><td><button class="btn light" onclick="printInvoice('${x.id}')">Print</button> <button class="btn light" onclick="openEditSale('${x.id}')">✏️ Edit</button> <button class="btn light" onclick="sendBillWhatsApp('${x.id}')">💬 Send Bill</button> <button class="btn light" onclick="tySendThankYou('${x.id}')">💌 Thank You</button> <button class="btn light" style="color:#c0392b" onclick="deleteSale('${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="8" class="empty">No sales</td></tr>'}
 function reverseInventoryForSale(item){if(item.manual)return;let p=db.products.find(x=>x.id===item.productId);if(!p)return;ensureInternalStock(p);if(item.type==='Attar'){p.stockG+=item.qty*sizeMl(item)}else if(item.type==='Raw Material'){p.stockG+=item.qty}else if(item.type==='Perfume'){let{attarG,alcG}=perfumeSplit(item.qty,item.size);p.stockG+=attarG;let alc=findProductByName('Alcohol');if(alc){ensureInternalStock(alc);alc.stockG+=alcG}}}
 function deleteSale(id){let s=db.sales.find(x=>x.id===id);if(!s)return;if(!confirm(`Delete sale invoice ${s.invoice}? This will restore the stock consumed by this sale and adjust the customer ledger.`))return;if(!s.imported)s.items.forEach(reverseInventoryForSale);let c=findPerson(db.customers,s.person);if(c){c.purchases=Math.max(0,c.purchases-s.total);c.outstanding=Math.max(0,c.outstanding-s.due);c.received=Math.max(0,c.received-s.paid)}db.sales=db.sales.filter(x=>x.id!==id);save()}
 function renderPurchases(){purchaseRows.innerHTML=db.purchases.slice().reverse().map(x=>`<tr><td>${esc(x.invoice)}</td><td>${esc(x.date)}</td><td>${esc(x.person)}</td><td>${x.items.length}</td><td>${money(x.total)}</td><td>${money(x.paid)}</td><td>${money(x.due)}</td><td><button class="btn light" style="color:#c0392b" onclick="deletePurchase('${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="8" class="empty">No purchases</td></tr>'}
@@ -1153,13 +1154,14 @@ function upiPayload(x){let s=db.settings||{},amount=s.qrMode==='total'?Number(x.
 function generateQrDataUrl(text){if(!text||typeof QRCode==='undefined')return '';let holder=document.createElement('div');holder.style.cssText='position:fixed;left:-10000px;top:-10000px;width:220px;height:220px;background:#fff;padding:8px';document.body.appendChild(holder);try{new QRCode(holder,{text,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});let canvas=holder.querySelector('canvas'),img=holder.querySelector('img'),data=canvas?canvas.toDataURL('image/png'):(img?img.src:'');holder.remove();return data}catch(e){holder.remove();return ''}}
 function invoiceStamp(x){let p=String(x.payment||'').toLowerCase();return p==='paid'?['PAID','#2e7d4f']:p==='partial'?['PARTIAL','#b7791f']:['DUE','#b3261e']}
 function invoiceLoyalty(x){let nm=String(x.person||'').trim();if(!nm||/^walk[\s-]?in$/i.test(nm))return null;try{return couponFor(x.id,nm)}catch(e){return null}}
-function printInvoice(id){let x=db.sales.find(s=>s.id===id);if(!x)return;let s=db.settings||{};
-let items=(x.items||[]).map(i=>`<tr><td class="n">${esc(i.name)}<small>${esc(i.free?'Free gift':(i.type||''))}</small></td><td>${esc(i.size||'-')}</td><td class="r">${esc(i.qty)}</td><td class="r">${i.free?'<span class="free">FREE</span>':money(i.rate)}</td><td class="r">${i.free?'<span class="free">FREE</span>':money(i.rate*i.qty)}</td></tr>`).join('');
-let upi=upiPayload(x),qr=(s.qrEnabled!==false&&upi)?generateQrDataUrl(upi):'',hasBank=!!(s.accountHolder||s.bankName||s.accountNumber||s.ifsc);
-let payBox=(qr||hasBank)?`<div class="pay">${qr?`<img src="${qr}" alt="UPI QR" class="qr">`:''}<p>${qr?`<b>SCAN &amp; PAY · UPI</b><br>${esc(s.upiId)}<br><span class="mut">${s.qrMode==='total'?'Full bill amount':'Balance due amount'}</span>`:''}${qr&&hasBank?'<br><br>':''}${hasBank?`<b>BANK TRANSFER</b><br>${esc(s.accountHolder||'—')}<br>${esc(s.bankName||'—')}<br>A/c ${esc(s.accountNumber||'—')}<br>IFSC ${esc(s.ifsc||'—')}`:''}</p></div>`:'<div></div>';
+function printInvoice(id){let x=db.sales.find(s=>s.id===id);if(!x)return;printInvoiceData(x)}
+function printInvoiceData(x){let s=db.settings||{};
+let items=(x.items||[]).map(i=>i.group?`<tr class="grp"><td colspan="5">${esc(i.group)}</td></tr>`:`<tr><td class="n">${esc(i.name)}<small>${esc(i.free?'Free gift':(i.type||''))}</small></td><td>${esc(i.size||'-')}</td><td class="r">${esc(i.qty)}</td><td class="r">${i.free?'<span class="free">FREE</span>':money(i.rate)}</td><td class="r">${i.free?'<span class="free">FREE</span>':money(i.rate*i.qty)}</td></tr>`).join('');
+let upi=x.isFinal?upiPayload({total:x.due,due:x.due}):upiPayload(x),qr=(s.qrEnabled!==false&&upi)?generateQrDataUrl(upi):'',hasBank=!!(s.accountHolder||s.bankName||s.accountNumber||s.ifsc);
+let payBox=(qr||hasBank)?`<div class="pay">${qr?`<img src="${qr}" alt="UPI QR" class="qr">`:''}<p>${qr?`<b>SCAN &amp; PAY · UPI</b><br>${esc(s.upiId)}<br><span class="mut">${x.isFinal||s.qrMode!=='total'?'Balance due amount':'Full bill amount'}</span>`:''}${qr&&hasBank?'<br><br>':''}${hasBank?`<b>BANK TRANSFER</b><br>${esc(s.accountHolder||'—')}<br>${esc(s.bankName||'—')}<br>A/c ${esc(s.accountNumber||'—')}<br>IFSC ${esc(s.ifsc||'—')}`:''}</p></div>`:'<div></div>';
 let row=(l,v,c)=>`<div${c?` class="${c}"`:''}><span>${l}</span><span>${v}</span></div>`;
 let tot=row('Subtotal',money(x.subtotal))+(x.discount>0?row('Discount'+(x.couponCode?' ('+esc(x.couponCode)+')':''),'− '+money(x.discount)):'')+(x.tax>0?row('GST '+esc(x.gst)+'%',money(x.tax)):'')+row('Total',money(x.total),'g')+row('Paid',money(x.paid))+row('Balance Due',money(x.due),'due');
-let st=invoiceStamp(x),c=invoiceLoyalty(x);
+let st=invoiceStamp(x),c=x.isFinal?null:invoiceLoyalty(x);
 let loyal=c?`<div class="loyal"><div class="lt">Thank you — here’s your ${esc(c.pct||LOYALTY_PCT)}% loyalty code: <b>${esc(c.code)}</b></div><div class="ls">Valid till ${esc(c.validTill)} · one-time use · share this code on WhatsApp with your next order</div></div>`:'';
 let from=[s.address,s.mobile,s.email,s.gst?'GSTIN: '+s.gst:''].filter(Boolean).map(esc).join('<br>');
 let to=[x.mobile,x.address].filter(Boolean).map(esc).join('<br>');
@@ -1201,8 +1203,9 @@ td.n{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600}td.n 
 .c2 td{padding:5px 10px;font-size:12px}.c2 td.n{font-size:14px}.c2 td.n small{display:inline;margin-left:6px}.c2 .qr{width:96px;height:96px}.c2 .card{padding:10px 16px}.c2 .card .nm{font-size:19px}
 .c3 td{padding:3px 8px;font-size:11.5px}.c3 td.n{font-size:13px}.c3 .top{padding:20px 40px 18px}.c3 .brand{font-size:34px}.c3 .meta{gap:12px}.c3 .card p{font-size:11px}.c3 .tot div{padding:3px 0}.c3 .tot .g{font-size:21px}.c3 .foot{padding:12px 40px 14px}
 @media print{.inv{min-height:0}.body{flex:none}.foot{break-inside:avoid;margin-top:18px}}
+tr.grp td{background:#f3ead9;color:#5b1220;font-weight:600;font-size:11px;letter-spacing:.08em;padding:7px 10px}
 </style><style>.ivbar{position:sticky;top:0;z-index:9;display:flex;gap:8px;justify-content:space-between;align-items:center;padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top));background:#111827;font-family:system-ui,-apple-system,sans-serif}.ivbar button{border:0;border-radius:9px;padding:10px 14px;font:600 14px system-ui,-apple-system,sans-serif;cursor:pointer}.ivbar .bk{background:#fff;color:#111827}.ivbar .pr{background:#d9b878;color:#241a17}@media print{.ivbar{display:none!important}}</style></head><body><div class="ivbar"><button class="bk" type="button" onclick="try{if(window.opener&&!window.opener.closed){window.opener.show&&window.opener.show('dashboard');window.opener.focus()}}catch(e){}window.close();var u=this.dataset.app;setTimeout(function(){location.href=u},250)" data-app="${esc(location.href.split('#')[0])}">← Dashboard</button><button class="pr" type="button" onclick="window.print()">🖨 Print / PDF</button></div><div class="inv ${(x.items||[]).length>12?'c1 c2 c3':(x.items||[]).length>6?'c1 c2':(x.items||[]).length>4?'c1':''}">
-<div class="top"><div class="brand">IZYAN<small>ATTAR &amp; PERFUMES</small></div><div class="doc"><b>${s.gst?'TAX INVOICE':'INVOICE'}</b><div>No. ${esc(x.invoice)}</div><div>${esc(x.date)}</div></div></div>
+<div class="top"><div class="brand">IZYAN<small>ATTAR &amp; PERFUMES</small></div><div class="doc"><b>${x.isFinal?'FINAL BILL':s.gst?'TAX INVOICE':'INVOICE'}</b><div>No. ${esc(x.invoice)}</div><div>${esc(x.date)}</div></div></div>
 <div class="body"><div class="meta"><div class="card${st[0]==='PAID'?' stamped':''}">${st[0]==='PAID'?'<span class="stamp">PAID</span>':''}<div class="lbl">BILLED TO</div><div class="nm">${esc(x.person)}</div><p>${to||'&nbsp;'}</p></div><div class="card"><div class="lbl">FROM</div><div class="nm">${esc(s.name||'IZYAN Attar & Perfumes')}</div><p>${from||'@izyan.attar'}</p></div></div>
 <table><thead><tr><th>PRODUCT</th><th>SIZE</th><th class="r">QTY</th><th class="r">RATE</th><th class="r">AMOUNT</th></tr></thead><tbody>${items}</tbody></table>
 <div class="sum">${payBox}<div class="tot">${tot}</div></div>
@@ -1716,5 +1719,94 @@ function ivShowInApp(html,name){let fn=('Invoice '+(name||'')).trim().replace(/[
   try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:file.name});return}}catch(e){if(e&&e.name==='AbortError')return}
   let u=URL.createObjectURL(file),a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)};
 }
+</script>
+<script>
+// ===================== Edit a saved bill (discount / GST / contact) =====================
+// Products and quantities are not editable here: stock was already used. Changing the discount
+// re-calculates total, due, profit and the customer's ledger; every change is kept in s.edits.
+const r2=n=>Math.round((+n||0)*100)/100;
+function saleAdjust(s,newDisc,newGst,reason){
+  let base=+s.subtotal||0,disc=Math.min(Math.max(r2(newDisc),0),base),gst=Math.max(0,+newGst||0);
+  let taxable=base-disc,tax=r2(taxable*gst/100),total=r2(taxable+tax),paid=+s.paid||0;
+  if(total<paid-0.005)throw new Error(`${s.invoice}: ₹${paid} is already received, so the total cannot go below that. Lower the discount.`);
+  let old={discount:+s.discount||0,gst:+s.gst||0,total:+s.total||0,due:+s.due||0};
+  if(Math.abs(old.discount-disc)<0.005&&old.gst===gst)return false;
+  s.discount=disc;s.gst=gst;s.tax=tax;s.total=total;s.due=r2(Math.max(0,total-paid));s.payment=s.due===0?'Paid':paid>0?'Partial':'Due';
+  s.profit=r2(total-tax-(+s.cogs||0));
+  let c=findPerson(db.customers,s.person||'');if(c){c.purchases=r2(Math.max(0,(+c.purchases||0)+total-old.total));c.outstanding=r2(Math.max(0,(+c.outstanding||0)+s.due-old.due))}
+  (s.edits=s.edits||[]).push({on:new Date().toLocaleString('en-IN'),discount:[old.discount,disc],gst:[old.gst,gst],total:[old.total,total],reason:reason||''});
+  return true}
+function openEditSale(id){let s=db.sales.find(x=>x.id===id);if(!s)return;window.editSaleId=id;
+  let hist=(s.edits||[]).map(e=>`<li>${esc(e.on)} — discount ${money(e.discount[0])} → ${money(e.discount[1])}, total ${money(e.total[0])} → ${money(e.total[1])}${e.reason?' · '+esc(e.reason):''}</li>`).join('');
+  modalContent.innerHTML=`<h2>Edit Bill ${esc(s.invoice)}</h2><p class="sub" style="margin:-4px 0 12px">${esc(s.person)} · ${esc(s.date)} · Subtotal <b>${money(s.subtotal)}</b> · Received so far <b>${money(s.paid)}</b></p>
+  <div class="formgrid"><div class="field"><label>Discount (₹)</label><input id="esDisc" type="number" min="0" step="1" value="${r2(s.discount)}" oninput="esPreview()"></div>
+  <div class="field"><label>or Discount (%)</label><input id="esPct" type="number" min="0" max="100" step="1" placeholder="e.g. 10" oninput="esDisc.value=r2((+${+s.subtotal||0})*(+this.value||0)/100);esPreview()"></div>
+  <div class="field"><label>GST %</label><input id="esGst" type="number" min="0" step="0.5" value="${+s.gst||0}" oninput="esPreview()"></div>
+  <div class="field"><label>Mobile</label><input id="esMob" inputmode="tel" value="${esc(s.mobile||'')}"></div>
+  <div class="field full"><label>Address</label><input id="esAddr" value="${esc(s.address||'')}"></div>
+  <div class="field full"><label>Reason (optional)</label><input id="esWhy" placeholder="e.g. Diwali discount, regular customer"></div></div>
+  <div class="notice" id="esPrev" style="margin-top:12px"></div>
+  <p class="sub" style="margin-top:8px">Products and quantities can't be changed here because stock was already used. To change products use Returns, or delete the bill and make a new one.</p>
+  ${hist?`<details style="margin-top:8px"><summary class="sub">Edit history</summary><ul class="sub">${hist}</ul></details>`:''}
+  <div class="actions"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveEditSale()">Save Changes</button></div>`;
+  modal.classList.add('show');esPreview()}
+function esPreview(){let s=db.sales.find(x=>x.id===window.editSaleId);if(!s)return;let base=+s.subtotal||0,disc=Math.min(Math.max(+esDisc.value||0,0),base),g=Math.max(0,+esGst.value||0),tax=r2((base-disc)*g/100),total=r2(base-disc+tax),due=r2(total-(+s.paid||0));
+  esPrev.innerHTML=due<-0.005?`⚠️ New total <b>${money(total)}</b> is less than the <b>${money(s.paid)}</b> already received. Lower the discount.`:`New total <b>${money(total)}</b> (was ${money(s.total)}) · Balance due <b>${money(Math.max(0,due))}</b>`}
+function saveEditSale(){let s=db.sales.find(x=>x.id===window.editSaleId);if(!s)return;
+  try{saleAdjust(s,+esDisc.value||0,+esGst.value||0,esWhy.value.trim())}catch(e){return alert(e.message)}
+  let m=esMob.value.trim(),a=esAddr.value.trim();s.mobile=m;s.address=a;let c=findPerson(db.customers,s.person||'');if(c){if(m)c.mobile=m;if(a)c.address=a}
+  save();closeModal();if(confirm('Bill updated. Send the updated bill to the customer on WhatsApp now?'))sendBillWhatsApp(s.id)}
+
+// ===================== Merge unpaid bills into one Final Bill =====================
+// A Final Bill is a single statement over a customer's unpaid invoices. The invoices stay as they are
+// (stock, dates and monthly reports unchanged); an extra discount is spread over them so the ledger stays right.
+function fbNextNo(){let n=(db.finalBills||[]).reduce((m,o)=>Math.max(m,+(String(o.no||'').replace(/\D/g,''))||0),0)+1;return 'FB-'+String(n).padStart(4,'0')}
+function fbUnpaidBy(name){let k=String(name||'').trim().toLowerCase();return db.sales.filter(x=>String(x.person||'').trim().toLowerCase()===k&&(+x.due||0)>0.005)}
+function openMergeBills(pre){db.finalBills=db.finalBills||[];
+  let by={};db.sales.forEach(x=>{if((+x.due||0)>0.005&&!/^walk[\s-]?in$/i.test(String(x.person||'').trim())){let k=String(x.person||'').trim().toLowerCase();(by[k]=by[k]||{name:x.person,n:0,due:0}).n++;by[k].due+=+x.due}});
+  let list=Object.values(by).filter(v=>v.n>=1).sort((a,b)=>b.n-a.n||b.due-a.due);
+  if(!list.length)return alert('No customer has unpaid bills right now.');
+  modalContent.innerHTML=`<h2>🧾 Merge Bills → Final Bill</h2><p class="sub" style="margin:-4px 0 12px">Pick a customer, tick the unpaid bills, add an extra discount if you want, and send one final bill.</p>
+  <div class="formgrid"><div class="field full"><label>Customer</label><select id="fbCust" onchange="fbRenderPick()">${list.map(v=>`<option value="${esc(v.name)}" ${pre&&pre===v.name?'selected':''}>${esc(v.name)} — ${v.n} unpaid bill${v.n>1?'s':''} · ${money(r2(v.due))} due</option>`).join('')}</select></div></div>
+  <div class="tablewrap" style="margin-top:10px"><table class="table"><thead><tr><th></th><th>Invoice</th><th>Date</th><th>Total</th><th>Paid</th><th>Due</th></tr></thead><tbody id="fbPick"></tbody></table></div>
+  <div class="formgrid" style="margin-top:10px"><div class="field"><label>Extra discount on final bill (₹)</label><input id="fbDisc" type="number" min="0" step="1" value="0" oninput="fbPreview()"></div></div>
+  <div class="notice" id="fbPrev" style="margin-top:10px"></div>
+  <div class="actions"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveFinalBill()">Create Final Bill</button></div>`;
+  modal.classList.add('show');fbRenderPick()}
+function fbRenderPick(){let bills=fbUnpaidBy(fbCust.value);fbPick.innerHTML=bills.map(x=>`<tr><td><input type="checkbox" class="fbChk" value="${x.id}" checked onchange="fbPreview()" style="width:auto"></td><td>${esc(x.invoice)}</td><td>${esc(x.date)}</td><td>${money(x.total)}</td><td>${money(x.paid)}</td><td><b>${money(x.due)}</b></td></tr>`).join('');fbPreview()}
+function fbSelected(){return [...document.querySelectorAll('.fbChk:checked')].map(c=>db.sales.find(x=>x.id===c.value)).filter(Boolean)}
+function fbPreview(){let b=fbSelected(),due=r2(b.reduce((s,x)=>s+(+x.due||0),0)),d=Math.min(Math.max(+fbDisc.value||0,0),due);
+  fbPrev.innerHTML=b.length?`${b.length} bill${b.length>1?'s':''} · due ${money(due)}${d?` − extra discount ${money(d)}`:''} → <b>Final amount to pay: ${money(r2(due-d))}</b>`:'Tick at least one bill.'}
+function fbSpread(bills,extra){ // spread the extra discount over the bills by their due amount (never more than a bill's due)
+  let due=bills.reduce((s,x)=>s+(+x.due||0),0);if(!(extra>0)||!(due>0))return;extra=Math.min(Math.round(extra),due);let left=extra;
+  bills.forEach((x,i)=>{let share=i===bills.length-1?left:Math.round(extra*(+x.due||0)/due);share=Math.min(share,+x.due||0,left);if(share<=0)return;
+    let g=+x.gst||0,addDisc=r2(share/(1+g/100));saleAdjust(x,(+x.discount||0)+addDisc,g,'Final bill extra discount');left=r2(left-share)})}
+function saveFinalBill(){let bills=fbSelected();if(!bills.length)return alert('Tick at least one bill');
+  bills.sort((a,b)=>(parseBizDate(a.date)-parseBizDate(b.date))||String(a.invoice).localeCompare(String(b.invoice)));
+  let extra=Math.max(0,+fbDisc.value||0),snap=JSON.stringify(db.sales),snapC=JSON.stringify(db.customers);
+  try{fbSpread(bills,extra)}catch(e){db.sales=JSON.parse(snap);db.customers=JSON.parse(snapC);return alert(e.message)}
+  let fb={id:'fb'+Date.now()+Math.random().toString(36).slice(2,6),no:fbNextNo(),date:new Date().toLocaleDateString('en-IN'),person:bills[0].person,mobile:bills.find(x=>x.mobile)?.mobile||'',address:bills.find(x=>x.address)?.address||'',saleIds:bills.map(x=>x.id),extraDiscount:r2(extra),created:Date.now()};
+  db.finalBills.push(fb);save();closeModal();finalBillDone(fb.id)}
+function finalBillDone(id){let fb=db.finalBills.find(x=>x.id===id);if(!fb)return;let x=fbData(fb);
+  modalContent.innerHTML=`<div style="text-align:center;padding:6px 4px"><div style="font-size:40px;line-height:1">🧾</div><h2 style="margin:10px 0 4px">Final Bill ${esc(fb.no)} ready</h2><p class="sub">${esc(fb.person)} · ${fb.saleIds.length} bills · Balance due <b>${money(x.due)}</b></p>
+  <div class="actions" style="justify-content:center;flex-wrap:wrap"><button class="btn" onclick="sendFinalBillWhatsApp('${fb.id}')">💬 Send on WhatsApp</button><button class="btn light" onclick="closeModal();printFinalBill('${fb.id}')">🖨 View / Print</button><button class="btn secondary" onclick="closeModal()">Done</button></div></div>`;modal.classList.add('show')}
+function fbData(fb){let s=fb.saleIds.map(id=>db.sales.find(x=>x.id===id)).filter(Boolean),items=[];
+  s.forEach(b=>{items.push({group:`${b.invoice} · ${b.date}`});(b.items||[]).forEach(i=>items.push(i))});
+  let sum=k=>r2(s.reduce((t,b)=>t+(+b[k]||0),0)),total=sum('total'),paid=sum('paid'),due=sum('due');
+  return {id:fb.id,isFinal:true,invoice:fb.no,date:fb.date,person:fb.person,mobile:fb.mobile,address:fb.address,items,subtotal:sum('subtotal'),discount:sum('discount'),gst:s.length&&s.every(b=>+b.gst===+s[0].gst)?s[0].gst:'',tax:sum('tax'),total,paid,due,payment:due<=0.005?'Paid':paid>0?'Partial':'Due',bills:s}}
+function printFinalBill(id){let fb=(db.finalBills||[]).find(x=>x.id===id);if(!fb)return;let x=fbData(fb);if(!x.bills.length)return alert('The bills in this final bill no longer exist.');
+  printInvoiceData(x)}
+function sendFinalBillWhatsApp(id){let fb=(db.finalBills||[]).find(x=>x.id===id);if(!fb)return;let x=fbData(fb),d=db.settings||{};
+  let ph=waNumber(fb.mobile);if(!ph){ph=waNumber(prompt('Customer WhatsApp number for '+fb.person+':')||'');if(!ph)return;fb.mobile=ph.slice(-10);save()}
+  let L=[`Assalamu Alaikum ${fb.person},`,'',`Here is your final bill from ${d.name||'IZYAN Attar & Perfumes'} ✨`,'',`🧾 *Final Bill ${fb.no}* — ${fb.date}`,''];
+  x.bills.forEach((b,n)=>L.push(`${n+1}. ${b.invoice} (${b.date}) — ${money(b.total)}${b.paid>0?' · paid '+money(b.paid):''}`));
+  L.push('',`Total of all bills: ${money(x.total)}`);if(fb.extraDiscount>0)L.push(`(includes extra discount of ${money(fb.extraDiscount)} 🎁)`);
+  L.push(`Paid: ${money(x.paid)}`,`*Balance due: ${money(x.due)}*`);if(x.due>0&&d.upiId)L.push(`Pay by UPI: ${d.upiId}`);
+  L.push('','— IZYAN Attar & Perfumes','💬 WhatsApp: +91 91364 66949');
+  window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(L.join('\n')),'_blank')}
+function deleteFinalBill(id){let fb=(db.finalBills||[]).find(x=>x.id===id);if(!fb)return;if(!confirm(`Remove final bill ${fb.no}? The original invoices stay as they are${fb.extraDiscount>0?' (the extra discount already given stays on them — use ✏️ Edit on a bill to change it)':''}.`))return;db.finalBills=db.finalBills.filter(x=>x.id!==id);save()}
+function renderFinalBills(){let p=document.getElementById('fbPanel');if(!p)return;let all=(db.finalBills||[]).slice().reverse();p.style.display=all.length?'':'none';
+  fbRows.innerHTML=all.map(fb=>{let x=fbData(fb);return `<tr><td><b>${esc(fb.no)}</b></td><td>${esc(fb.date)}</td><td>${esc(fb.person)}</td><td>${x.bills.map(b=>esc(b.invoice)).join(', ')}</td><td>${money(x.total)}</td><td><b>${money(x.due)}</b> ${badge(x.payment)}</td><td><button class="btn light" onclick="printFinalBill('${fb.id}')">Print</button> <button class="btn light" onclick="sendFinalBillWhatsApp('${fb.id}')">💬 Send</button> <button class="btn light" style="color:#c0392b" onclick="deleteFinalBill('${fb.id}')">Delete</button></td></tr>`}).join('')}
+(function(){db.finalBills=db.finalBills||[];if(typeof renderSales==='function'){const base=renderSales;renderSales=function(){base.apply(this,arguments);try{renderFinalBills()}catch(e){console.error(e)}}}try{renderFinalBills()}catch(e){}})();
 </script>
 </body></html>
